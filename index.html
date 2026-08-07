@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Praswa Gifts Catalogue</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+
+    <header class="header">
+
+        <div class="logo">
+            PRASWA GIFTS
+        </div>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search products..."
+            >
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- Categories -->
+
+        <section class="section">
+
+            <h2>Shop by Category</h2>
+
+            <div
+                id="categoryContainer"
+                class="category-container"
+            >
+
+                <!-- Categories will be created by JavaScript -->
+
+            </div>
+
+        </section>
+
+
+        <!-- Products -->
+
+        <section class="section">
+
+            <div class="products-header">
+
+                <h2 id="productsTitle">
+                    All Products
+                </h2>
+
+                <button
+                    id="allProductsButton"
+                    class="all-products-button"
+                >
+                    View All
+                </button>
+
+            </div>
+
+
+            <div
+                id="productContainer"
+                class="product-container"
+            >
+
+                <!-- Products will be created by JavaScript -->
+
+            </div>
+
+        </section>
+        <!-- Product Details Modal -->
+
+<div
+    id="productModal"
+    class="product-modal"
+>
+
+    <div class="product-modal-content">
+
+        <button
+            id="closeModal"
+            class="close-modal"
+        >
+            ✕
+        </button>
+
+        <div
+            id="modalProductImage"
+            class="modal-product-image"
+        >
+        </div>
+
+        <div class="modal-product-info">
+
+            <h2 id="modalProductName"></h2>
+
+            <p>
+                <strong>Product Code:</strong>
+                <span id="modalProductCode"></span>
+            </p>
+
+            <p>
+                <strong>Category:</strong>
+                <span id="modalProductCategory"></span>
+            </p>
+
+            <p>
+                <strong>Sub Category:</strong>
+                <span id="modalProductSubCategory"></span>
+            </p>
+
+            <p>
+                <strong>Material:</strong>
+                <span id="modalProductMaterial"></span>
+            </p>
+
+            <p>
+                <strong>Size:</strong>
+                <span id="modalProductSize"></span>
+            </p>
+
+            <p>
+                <strong>MOQ:</strong>
+                <span id="modalProductMOQ"></span>
+            </p>
+
+            <button
+                id="whatsappButton"
+                class="whatsapp-button"
+            >
+                💬 Enquire on WhatsApp
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
