@@ -1,5 +1,5 @@
 /* Set this to your existing Google Apps Script deployment URL. No other backend changes are required. */
-const API_URL = 'https://script.google.com/macros/s/AKfycbzPJkwe5MbuODyQXfGo5rnIMxqi-cpl2WUPOKrX3IVg93qDsELzfGJMinIpQH1gWT69/exec'; // e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
+const API_URL = 'https://script.google.com/macros/s/AKfycbzdJfJ2x7nZvdkoCQlJ3nKRit8EJlX-luqJlVNYxdN6JTq1JSz12_dV3tJMPXTZ5gei/exec'; // e.g. 'https://script.google.com/macros/s/AKfycb.../exec'
 const WHATSAPP = '918985390330';
 /* Update storefront contact/location details here; the catalogue API remains unchanged. */
 const STORE = { phone: '+91 89853 90330', email: 'hello@praswagifts.com', instagram: 'https://www.instagram.com/praswa_gifts_crafts', address: 'Add your business address here', mapsUrl: 'https://maps.google.com/?q=Add+your+business+address+here' };
