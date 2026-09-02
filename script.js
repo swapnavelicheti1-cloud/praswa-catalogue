@@ -68,7 +68,98 @@ function renderCart(){const list=$('#cartItems'),total=cart.reduce((n,item)=>n+p
 function configureStore(){const phoneHref=`tel:${STORE.phone.replace(/\s/g,'')}`;if($('#sidePhone')){$('#sidePhone').href=phoneHref;$('#sidePhone').textContent=STORE.phone}if($('#sideEmail')){$('#sideEmail').href=`mailto:${STORE.email}`;$('#sideEmail').textContent=STORE.email}if($('#sideInstagram'))$('#sideInstagram').href=STORE.instagram;if($('#footerAddress'))$('#footerAddress').textContent=STORE.address;if($('#footerPhone')){$('#footerPhone').href=phoneHref;$('#footerPhone').textContent=STORE.phone}if($('#footerEmail')){$('#footerEmail').href=`mailto:${STORE.email}`;$('#footerEmail').textContent=STORE.email}if($('#footerInstagram'))$('#footerInstagram').href=STORE.instagram}
 function init(){ configureStore();try{cart=JSON.parse(localStorage.getItem(CART_KEY)||'[]')}catch{cart=[]}updateCartCount();const side=$('#sideMenu'),backdrop=$('#menuBackdrop'),toggle=()=>{const open=side.classList.toggle('open');backdrop.classList.toggle('open',open);$('.menu-toggle').setAttribute('aria-expanded',open);side.setAttribute('aria-hidden',!open)};$('.menu-toggle').onclick=toggle;$('.side-menu-close').onclick=toggle;backdrop.onclick=toggle;side.querySelectorAll('nav a').forEach(a=>a.onclick=()=>side.classList.contains('open')&&toggle());$('.cart-trigger').onclick=()=>{renderCart();$('#cartModal').showModal()};$('#homeSearchInput').oninput=renderHomeCategories;document.querySelectorAll('.modal-close').forEach(b=>b.onclick=()=>b.closest('dialog').close());['#productModal','#cartModal','#checkoutModal'].forEach(s=>$(s).addEventListener('click',e=>{if(e.target===$(s))$(s).close()}));$('#checkoutButton').onclick=()=>{$('#cartModal').close();$('#checkoutModal').showModal()};$('#checkoutForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),lines=cart.map(item=>`• ${productName(item.product)} × ${item.quantity} — ${priceLabel(item.product)}`),total=cart.reduce((n,item)=>n+priceOf(item.product)*item.quantity,0),message=`Hello Praswa Gifts, I would like to place an order.\n\n${lines.join('\n')}\n\n*Total: ₹${total.toLocaleString('en-IN')}*\n\nCustomer name: ${f.get('name')}\nPhone: ${f.get('phone')}\nAddress: ${f.get('address')}\n\nPlease confirm availability and final order details.`;window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`,'_blank')}; loadProducts(); }
 function setupQuantityTyping(){ document.addEventListener('input',event=>{if(event.target.matches('.modal-quantity-value,.cart-quantity-value'))event.stopImmediatePropagation()},true); document.addEventListener('blur',event=>{const input=event.target;if(input.matches('.modal-quantity-value')){const minimum=Number(input.min)||1;input.value=Math.max(minimum,Number(input.value)||minimum)}if(input.matches('.cart-quantity-value')){const index=Number(input.dataset.index),minimum=moqOf(cart[index].product);cart[index].quantity=Math.max(minimum,Number(input.value)||minimum);localStorage.setItem(CART_KEY,JSON.stringify(cart));updateCartCount();renderCart()}},true); }
-function simplifyPriceFilter(){ const range=$('.price-range'),minimum=$('#homePriceMin'),maximum=$('#homePriceMax'); if(!range||!minimum||!maximum)return; minimum.closest('label').hidden=true;maximum.closest('label').hidden=true;if(range.querySelector('.price-filter-label'))return;const label=document.createElement('label'),entry=document.createElement('input');label.className='price-filter-label';label.htmlFor='homePriceEntry';label.textContent='Price up to ₹';entry.id='homePriceEntry';entry.type='number';entry.min='0';entry.placeholder='Any price';entry.value=Number(maximum.value)===Number(maximum.max)?'':maximum.value;entry.inputMode='numeric';entry.setAttribute('aria-label','Maximum price');entry.onchange=()=>{homeMaxPrice=entry.value===''?Number(maximum.max):Math.max(0,Number(entry.value)||Number(maximum.max));homePage=1;renderHomeCategories()};range.append(label,entry); }
+// ============================================================
+// QUANTITY TYPING HANDLER
+// ============================================================
+
+function setupQuantityTyping() {
+
+  // Handle typing in quantity fields
+  document.addEventListener('input', event => {
+
+    const input = event.target;
+
+    // Make sure the event target is an HTML element
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+
+    if (
+      input.matches(
+        '.modal-quantity-value, .cart-quantity-value'
+      )
+    ) {
+      event.stopImmediatePropagation();
+    }
+
+  }, true);
+
+
+  // Handle quantity when user leaves the input
+  document.addEventListener('blur', event => {
+
+    const input = event.target;
+
+    // Make sure the event target is an HTML element
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // Product modal quantity
+    // --------------------------------------------------------
+
+    if (input.matches('.modal-quantity-value')) {
+
+      const minimum = Number(input.min) || 1;
+
+      input.value = Math.max(
+        minimum,
+        Number(input.value) || minimum
+      );
+
+    }
+
+
+    // --------------------------------------------------------
+    // Cart quantity
+    // --------------------------------------------------------
+
+    if (input.matches('.cart-quantity-value')) {
+
+      const index = Number(input.dataset.index);
+
+      // Make sure cart item exists
+      if (!cart[index]) {
+        return;
+      }
+
+      const minimum = moqOf(cart[index].product);
+
+      cart[index].quantity = Math.max(
+        minimum,
+        Number(input.value) || minimum
+      );
+
+      localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+      );
+
+      updateCartCount();
+      renderCart();
+
+    }
+
+  }, true);
+
+}
+
+
+// ============================================================
+// END OF QUANTITY TYPING HANDLER
+// ============================================================
 new MutationObserver(simplifyPriceFilter).observe(document.body,{childList:true,subtree:true});
 function simplifyPriceFilter(){ const range=$('.range-filter'),from=$('#homePriceFrom'),to=$('#homePriceTo'),pager=$('#homePagination');if(pager&&!pager.children.length)pager.innerHTML='<span class="page-status">Page 1 of 1</span>';if(!range||!from||!to)return;const labels=range.querySelectorAll('label');if(!labels.length)return;const low=Number(from.value),high=Number(to.value);range.classList.add('dual-range');range.style.setProperty('--from',`${low/500}%`);range.style.setProperty('--to',`${high/500}%`);labels[0].childNodes[0].nodeValue=`₹${low.toLocaleString('en-IN')} – ₹${high.toLocaleString('en-IN')}`;labels[0].querySelector('input').hidden=true;if(labels[1])labels[1].hidden=true; }
 function renderHomeCategories(){
@@ -99,40 +190,204 @@ function renderHomeCategories(){
   const setPriceRange=(min,max)=>{homeMinPrice=Math.max(priceFloor,Math.min(Number(min)||0,priceCeiling));homeMaxPrice=Math.max(homeMinPrice,Math.min(Number(max)||priceCeiling,priceCeiling));homePage=1;renderHomeCategories();};
   $('#homePriceFrom').onchange=e=>setPriceRange(e.target.value,homeMaxPrice);$('#homePriceTo').onchange=e=>setPriceRange(homeMinPrice,e.target.value);$('#homePriceMin').oninput=e=>setPriceRange(e.target.value,homeMaxPrice);$('#homePriceMax').oninput=e=>setPriceRange(homeMinPrice,e.target.value);$('#homeSortSelect').value=sort;$('#homeSortSelect').onchange=()=>{homePage=1;renderHomeCategories();};
   const grid=$('#homeProductsGrid');grid.innerHTML='';pageItems.forEach(p=>grid.append(card(p)));
-const paginationHtml = shown.length > HOME_PAGE_SIZE
-  ? `<button data-page="${homePage - 1}" ${homePage === 1 ? 'disabled' : ''}>← Previous</button>
-     ${Array.from(
-       { length: totalPages },
-       (_, index) =>
-         `<button class="${index + 1 === homePage ? 'active' : ''}" data-page="${index + 1}">
-            ${index + 1}
-          </button>`
-     ).join('')}
-     <button data-page="${homePage + 1}" ${homePage === totalPages ? 'disabled' : ''}>
-       Next →
-     </button>`
-  : '';
+// ============================================================
+// COMPACT PAGINATION
+// ============================================================
+
+function createPagination(currentPage, totalPages) {
+
+  // No pagination needed for one page
+  if (totalPages <= 1) {
+    return '';
+  }
+
+  const pages = [];
+
+  function addPage(page) {
+    if (
+      page >= 1 &&
+      page <= totalPages &&
+      !pages.includes(page)
+    ) {
+      pages.push(page);
+    }
+  }
+
+  // Always show first page
+  addPage(1);
+
+  // ----------------------------------------------------------
+  // Beginning of pagination
+  // Example:
+  // 1  2  3  4  ...  100
+  // ----------------------------------------------------------
+  if (currentPage <= 3) {
+
+    addPage(2);
+    addPage(3);
+    addPage(4);
+
+    if (totalPages > 5) {
+      pages.push('...');
+    }
+
+  // ----------------------------------------------------------
+  // End of pagination
+  // Example:
+  // 1  ...  97  98  99  100
+  // ----------------------------------------------------------
+  } else if (currentPage >= totalPages - 2) {
+
+    if (totalPages > 5) {
+      pages.push('...');
+    }
+
+    addPage(totalPages - 3);
+    addPage(totalPages - 2);
+    addPage(totalPages - 1);
+
+  // ----------------------------------------------------------
+  // Middle of pagination
+  // Example:
+  // 1  ...  49  50  51  ...  100
+  // ----------------------------------------------------------
+  } else {
+
+    pages.push('...');
+
+    addPage(currentPage - 1);
+    addPage(currentPage);
+    addPage(currentPage + 1);
+
+    pages.push('...');
+  }
+
+  // Always show last page
+  addPage(totalPages);
+
+  // Remove duplicate "..."
+  const cleanPages = pages.filter((page, index) => {
+    return !(
+      page === '...' &&
+      pages[index - 1] === '...'
+    );
+  });
+
+  // ----------------------------------------------------------
+  // Create pagination HTML
+  // ----------------------------------------------------------
+  return `
+
+    <button
+      type="button"
+      data-page="${currentPage - 1}"
+      ${currentPage === 1 ? 'disabled' : ''}
+    >
+      ← Previous
+    </button>
+
+    ${cleanPages.map(page => {
+
+      // Ellipsis
+      if (page === '...') {
+        return `
+          <span class="page-dots">...</span>
+        `;
+      }
+
+      // Page number
+      return `
+        <button
+          type="button"
+          class="${page === currentPage ? 'active' : ''}"
+          data-page="${page}"
+        >
+          ${page}
+        </button>
+      `;
+    }).join('')}
+
+    <button
+      type="button"
+      data-page="${currentPage + 1}"
+      ${currentPage === totalPages ? 'disabled' : ''}
+    >
+      Next →
+    </button>
+
+  `;
+}
+
+
+// ============================================================
+// DISPLAY PAGINATION
+// ============================================================
+
+const paginationHtml =
+  createPagination(homePage, totalPages);
+
+
+// ============================================================
+// TOP PAGINATION
+// ============================================================
 
 const pagerTop = $('#homePaginationTop');
+
+if (pagerTop) {
+  pagerTop.innerHTML = paginationHtml;
+}
+
+
+// ============================================================
+// BOTTOM PAGINATION
+// ============================================================
+
 const pagerBottom = $('#homePagination');
 
-if (pagerTop) pagerTop.innerHTML = paginationHtml;
-if (pagerBottom) pagerBottom.innerHTML = paginationHtml;
+if (pagerBottom) {
+  pagerBottom.innerHTML = paginationHtml;
+}
+
+
+// ============================================================
+// PAGINATION BUTTON EVENTS
+// ============================================================
 
 document
-  .querySelectorAll('#homePaginationTop button[data-page], #homePagination button[data-page]')
+  .querySelectorAll(
+    '#homePaginationTop button[data-page], ' +
+    '#homePagination button[data-page]'
+  )
   .forEach(button => {
+
     button.onclick = () => {
+
+      // Do nothing if Previous/Next is disabled
+      if (button.disabled) {
+        return;
+      }
+
+      // Get selected page
       homePage = Number(button.dataset.page);
+
+      // Render selected page
       renderHomeCategories();
 
-      // Scroll back to the product heading when changing page
+      // Scroll back to product heading
       $('#homeProductsHeading')?.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
+
     };
-  }); 
+
+  });
+
+
+// ============================================================
+// END OF renderHomeCategories()
+// ============================================================
+
 }
 setupQuantityTyping();
 init();
