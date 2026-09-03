@@ -56,16 +56,13 @@ let cart = [];
 let homeCategory = '';
 let homeSubcategory = '';
 
+let homeMaterial = '';
+let homeOccasion = '';
+
 let homePage = 1;
 
-/*
-   Price filter state
-
-   null = not initialized
-*/
 let homeMinPrice = null;
 let homeMaxPrice = null;
-
 
 /* ============================================================
    OCCASIONS
@@ -218,6 +215,20 @@ const subcategory = p =>
     'subcategory'
   );
 
+  const material = p =>
+  value(
+    p,
+    'Material',
+    'material'
+  );
+
+
+const occasion = p =>
+  value(
+    p,
+    'Occasion',
+    'occasion'
+  );
 
 const active = p =>
   value(
@@ -263,6 +274,13 @@ function priceOf(p) {
     : 0;
 }
 
+function getMaterial(p) {
+    return value(p, 'Material', 'material');
+}
+
+function getOccasion(p) {
+    return value(p, 'Occasion', 'occasion');
+}
 
 function priceLabel(p) {
 
@@ -877,6 +895,11 @@ function applyFilters() {
   const sort =
     $('#sortSelect').value;
 
+const minPrice =
+  homeMinPrice;
+
+const maxPrice =
+  homeMaxPrice;
 
   filtered =
     products.filter(
@@ -893,18 +916,28 @@ function applyFilters() {
             .join(' ')
             .toLowerCase();
 
+return (
+  (!q ||
+    hay.includes(q)) &&
 
-        return (
-          (!q ||
-            hay.includes(q)) &&
+  (!cat ||
+    category(p) === cat) &&
 
-          (!cat ||
-            category(p) === cat) &&
+  (!sub ||
+    subcategory(p) === sub) &&
 
-          (!sub ||
-            subcategory(p) === sub)
-        );
+  (!homeMaterial ||
+    material(p) === homeMaterial) &&
 
+  (!homeOccasion ||
+    occasion(p) === homeOccasion) &&
+
+  (minPrice === null ||
+    priceOf(p) >= minPrice) &&
+
+  (maxPrice === null ||
+    priceOf(p) <= maxPrice)
+);
       }
     );
 
@@ -1319,11 +1352,261 @@ function openProduct(p) {
 
 }
 
+function renderSideFilters() {
+
+  const materialMenu =
+    document.getElementById('sideMaterialMenu');
+
+  const occasionMenu =
+    document.getElementById('sideOccasionMenu');
+
+  const priceMenu =
+    document.getElementById('sidePriceMenu');
+
+  if (!materialMenu || !occasionMenu || !priceMenu) {
+    return;
+  }
+
+
+  /* ==========================================================
+     SHOP BY CATEGORY - MATERIAL
+     ========================================================== */
+
+  const materials = [
+    ...new Set(
+      products
+        .map(p =>
+          value(p, 'Material', 'material')
+        )
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  materialMenu.innerHTML = `
+    <button
+      type="button"
+      class="side-filter-item active"
+      data-material=""
+    >
+      All Items
+    </button>
+
+    ${materials.map(name => `
+      <button
+        type="button"
+        class="side-filter-item"
+        data-material="${name}"
+      >
+        ${name}
+      </button>
+    `).join('')}
+  `;
+
+
+  /* ==========================================================
+     SHOP BY OCCASION
+     ========================================================== */
+
+  const occasionsList = [
+    ...new Set(
+      products
+        .map(p =>
+          value(p, 'Occasion', 'occasion')
+        )
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  occasionMenu.innerHTML = `
+    <button
+      type="button"
+      class="side-filter-item active"
+      data-occasion=""
+    >
+      All Occasions
+    </button>
+
+    ${occasionsList.map(name => `
+      <button
+        type="button"
+        class="side-filter-item"
+        data-occasion="${name}"
+      >
+        ${name}
+      </button>
+    `).join('')}
+  `;
+
+
+  /* ==========================================================
+     PRICE RANGE
+     ========================================================== */
+
+  priceMenu.innerHTML = `
+    <button
+      type="button"
+      class="side-price-item"
+      data-price-filter="all">
+      All Prices
+    </button>
+
+    <button
+      type="button"
+      class="side-price-item"
+      data-price-filter="100">
+      Under ₹100
+    </button>
+
+    <button
+      type="button"
+      class="side-price-item"
+      data-price-filter="200">
+      Under ₹200
+    </button>
+
+    <button
+      type="button"
+      class="side-price-item"
+      data-price-filter="300">
+      Under ₹300
+    </button>
+
+    <button
+      type="button"
+      class="side-price-item"
+      data-price-filter="500">
+      Under ₹500
+    </button>
+
+    <button
+      type="button"
+      class="side-price-item"
+      data-price-filter="1000-plus">
+      ₹1,000 & Above
+    </button>
+  `;
+
+
+  /* ==========================================================
+     MATERIAL CLICK
+     ========================================================== */
+
+  materialMenu
+    .querySelectorAll('[data-material]')
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        homeMaterial =
+          button.dataset.material;
+
+        homeOccasion = '';
+
+        homeCategory = '';
+        homeSubcategory = '';
+
+        homePage = 1;
+
+        renderHomeCategories();
+
+        closeSideMenu();
+      };
+
+    });
+
+
+  /* ==========================================================
+     OCCASION CLICK
+     ========================================================== */
+
+  occasionMenu
+    .querySelectorAll('[data-occasion]')
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        homeOccasion =
+          button.dataset.occasion;
+
+        homeMaterial = '';
+
+        homeCategory = '';
+        homeSubcategory = '';
+
+        homePage = 1;
+
+        renderHomeCategories();
+
+        closeSideMenu();
+      };
+
+    });
+
+
+  /* ==========================================================
+     PRICE CLICK
+     ========================================================== */
+
+  priceMenu
+    .querySelectorAll('[data-price-filter]')
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        const filter =
+          button.dataset.priceFilter;
+
+
+        if (filter === 'all') {
+
+          homeMinPrice = null;
+          homeMaxPrice = null;
+
+        } else if (filter === '100') {
+
+          homeMinPrice = null;
+          homeMaxPrice = 100;
+
+        } else if (filter === '200') {
+
+          homeMinPrice = null;
+          homeMaxPrice = 200;
+
+        } else if (filter === '300') {
+
+          homeMinPrice = null;
+          homeMaxPrice = 300;
+
+        } else if (filter === '500') {
+
+          homeMinPrice = null;
+          homeMaxPrice = 500;
+
+        } else if (filter === '1000-plus') {
+
+          homeMinPrice = 1000;
+          homeMaxPrice = null;
+
+        }
+
+
+        homePage = 1;
+
+        renderHomeCategories();
+
+        closeSideMenu();
+
+      };
+
+    });
+
+}
 
 /* ============================================================
    LOAD / SET PRODUCTS
    ============================================================ */
-
 function setProducts(data) {
 
   products =
@@ -1336,15 +1619,14 @@ function setProducts(data) {
     )
       .filter(active);
 
-
   filtered =
     [...products];
 
+  renderSideFilters();
 
   renderHomeCategories();
 
 }
-
 
 /* ============================================================
    LOAD PRODUCTS FROM API
@@ -1953,7 +2235,171 @@ function configureStore() {
 
 }
 
+function renderSideFilters() {
 
+  const materialMenu =
+    document.getElementById('sideMaterialMenu');
+
+  const occasionMenu =
+    document.getElementById('sideOccasionMenu');
+
+  if (!materialMenu || !occasionMenu) {
+    return;
+  }
+
+
+  /* -------------------------------
+     SHOP BY CATEGORY - MATERIAL
+     ------------------------------- */
+
+  const materials = [
+    ...new Set(
+      products
+        .map(material)
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  materialMenu.innerHTML = `
+
+    <button
+      type="button"
+      class="side-filter-item"
+      data-material=""
+    >
+      <span>All Items</span>
+      <span>${products.length}</span>
+    </button>
+
+    ${materials.map(name => {
+
+      const count =
+        products.filter(
+          p => material(p) === name
+        ).length;
+
+      return `
+        <button
+          type="button"
+          class="side-filter-item"
+          data-material="${escapeHtml(name)}"
+        >
+          <span>${escapeHtml(name)}</span>
+          <span>${count}</span>
+        </button>
+      `;
+
+    }).join('')}
+
+  `;
+
+
+  /* -------------------------------
+     SHOP BY OCCASION
+     ------------------------------- */
+
+  const occasionsList = [
+    ...new Set(
+      products
+        .map(occasion)
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  occasionMenu.innerHTML = `
+
+    <button
+      type="button"
+      class="side-filter-item"
+      data-occasion=""
+    >
+      <span>All Occasions</span>
+      <span>${products.length}</span>
+    </button>
+
+    ${occasionsList.map(name => {
+
+      const count =
+        products.filter(
+          p => occasion(p) === name
+        ).length;
+
+      return `
+        <button
+          type="button"
+          class="side-filter-item"
+          data-occasion="${escapeHtml(name)}"
+        >
+          <span>${escapeHtml(name)}</span>
+          <span>${count}</span>
+        </button>
+      `;
+
+    }).join('')}
+
+  `;
+
+
+  /* -------------------------------
+     CLICK - MATERIAL
+     ------------------------------- */
+
+  materialMenu
+    .querySelectorAll('[data-material]')
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        homeMaterial =
+          button.dataset.material;
+
+        homeOccasion = '';
+
+        homeCategory = '';
+        homeSubcategory = '';
+
+        homePage = 1;
+
+        applyFilters();
+
+        closeSideMenu();
+
+      };
+
+    });
+
+
+  /* -------------------------------
+     CLICK - OCCASION
+     ------------------------------- */
+
+  occasionMenu
+    .querySelectorAll('[data-occasion]')
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        homeOccasion =
+          button.dataset.occasion;
+
+        homeMaterial = '';
+
+        homeCategory = '';
+        homeSubcategory = '';
+
+        homePage = 1;
+
+        applyFilters();
+
+        closeSideMenu();
+
+      };
+
+    });
+
+}
 /* ============================================================
    HOME CATEGORY / PRODUCT SECTION
    OPTION 5 PRICE FILTER
@@ -2267,13 +2713,15 @@ function renderHomeCategories() {
       p => {
 
         const hay =
-          [
-            productName(p),
-            productCode(p),
-            productId(p),
-            category(p),
-            subcategory(p)
-          ]
+  [
+    productName(p),
+    productCode(p),
+    productId(p),
+    category(p),
+    subcategory(p),
+    material(p),
+    occasion(p)
+  ]
             .join(' ')
             .toLowerCase();
 
