@@ -32,7 +32,7 @@ const STORE = {
   email: 'praswareturngifts@gmail.com',
   instagram: 'https://www.instagram.com/praswa_gifts_crafts',
   address: 'Flat No 101, Rajaratna Residency, Street No 2, HMT Nagar, Nacharam, 500076',
-  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Flat+No+101%2C+Rajaratna+Residency%2C+Street+No+2%2C+HMT+Nagar%2C+Nacharam%2C+500076'
+  mapsUrl: 'https://www.google.com/maps/place/Praswa+Gifts/@17.4237807,78.5484847,17z/data=!4m16!1m9!3m8!1s0x3bcb99f9c6ac8207:0x22d9d96afd2f94f4!2sPraswa+Gifts!8m2!3d17.4237807!4d78.5484847!9m1!1b1!16s%2Fg%2F11y5p5t02b!3m5!1s0x3bcb99f9c6ac8207:0x22d9d96afd2f94f4!8m2!3d17.4237807!4d78.5484847!16s%2Fg%2F11y5p5t02b?entry=ttu&g_ep=EgoyMDI2MDkwMi4wIKXMDSoASAFQAw%3D%3D'
 };
 
 const CACHE_KEY = 'praswa_gifts_products_v1';
