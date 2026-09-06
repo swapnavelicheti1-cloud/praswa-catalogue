@@ -1161,3 +1161,61 @@ footer .footer-quick-links a {
   /* Preserve existing pagination styling */
 }
 
+
+
+/* ============================================================
+   MOBILE PRODUCTS HEADER - ALL ITEMS + SORT ON SAME LINE
+   ============================================================ */
+
+@media (max-width: 620px) {
+
+  .home-products-heading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+
+  .products-heading-left {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .products-heading-left h3 {
+    margin: 0 !important;
+    white-space: nowrap;
+  }
+
+  .products-heading-right {
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  .products-heading-right .sort-label {
+    display: none !important;
+  }
+
+  .products-heading-right select {
+    width: auto !important;
+    min-width: 112px;
+    max-width: 140px;
+    height: 38px;
+    padding: 0 28px 0 10px;
+    margin: 0 !important;
+    font-size: 11px;
+  }
+
+  .applied-filters {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    width: 100%;
+  }
+
+}
