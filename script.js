@@ -3,18 +3,16 @@
    ============================================================
    Includes:
    - Google Sheets API
-   - Categories / Subcategories
    - Product catalogue
-   - Search
-   - Sorting
+   - Search and sorting
+   - Material / occasion filters
+   - Applied filter chips with remove buttons
    - Product details
    - MOQ quantity controls
    - Cart
-   - WhatsApp
-   - Checkout
-   - Compact pagination
-   - OPTION 5 PRICE FILTER
-     Quick filters + Custom From/To
+   - WhatsApp checkout
+   - Pagination
+   - Lazy-loaded images
    ============================================================ */
 
 
@@ -38,9 +36,7 @@ const STORE = {
 const CACHE_KEY = 'praswa_gifts_products_v1';
 const CART_KEY = 'praswa_gifts_cart_v1';
 
-const CACHE_MAX_AGE = 1000 * 60 * 30;
 
-const PAGE_SIZE = 12;
 const HOME_PAGE_SIZE = 12;
 
 
@@ -49,12 +45,42 @@ const HOME_PAGE_SIZE = 12;
    ============================================================ */
 
 let products = [];
-let filtered = [];
-let visibleCount = PAGE_SIZE;
 let cart = [];
 
-let homeCategory = '';
-let homeSubcategory = '';
+/* Load product images only when they are near the viewport. */
+const lazyImageObserver =
+  'IntersectionObserver' in window
+    ? new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            const img = entry.target;
+            const src = img.dataset.src;
+
+            if (src) {
+              img.src = src;
+              img.removeAttribute('data-src');
+            }
+
+            lazyImageObserver.unobserve(img);
+          });
+        },
+        { rootMargin: '250px 0px' }
+      )
+    : null;
+
+function observeLazyImage(img) {
+  if (!img) return;
+
+  if (lazyImageObserver) {
+    lazyImageObserver.observe(img);
+  } else if (img.dataset.src) {
+    img.src = img.dataset.src;
+    img.removeAttribute('data-src');
+  }
+}
+
 let homeMaterial = '';
 let homeOccasion = '';
 
@@ -331,7 +357,7 @@ function driveUrl(url) {
   return id &&
     /drive\.google\.com/i.test(url)
 
-    ? `https://drive.google.com/thumbnail?id=${id}&sz=w1200`
+    ? `https://drive.google.com/thumbnail?id=${id}&sz=w800`
 
     : url;
 }
@@ -379,32 +405,6 @@ Please share the price and details.`
 }
 
 
-/* ============================================================
-   OCCASIONS
-   ============================================================ */
-
-function renderOccasions() {
-
-  $('#occasionGrid').innerHTML =
-    occasions
-      .map(
-        ([title, desc, icon]) =>
-          `
-          <a
-            href="#shop"
-            class="occasion-card"
-            data-icon="${icon}"
-            data-occasion="${title}"
-          >
-            <h3>${title}</h3>
-            <p>${desc}</p>
-          </a>
-          `
-      )
-      .join('');
-
-}
-
 
 /* ============================================================
    PRODUCT CARD
@@ -434,13 +434,19 @@ function card(p) {
 
 
   if (image) {
+    img.dataset.src = image;
+    img.classList.add('lazy-image');
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.fetchPriority = 'low';
 
-    img.src = image;
+    img.onload = () => {
+      img.classList.add('loaded');
+    };
 
     img.onerror = () => {
       img.style.display = 'none';
     };
-
   }
 
 
@@ -583,6 +589,7 @@ function card(p) {
       quantity
     );
 
+  observeLazyImage(img);
 
   return node;
 
@@ -593,180 +600,24 @@ function card(p) {
    MAIN CATALOGUE PRODUCTS
    ============================================================ */
 
-function renderProducts() {
-
-  const grid =
-    $('#catalogueGrid');
-
-  grid.innerHTML = '';
-
-
-  filtered
-    .slice(
-      0,
-      visibleCount
-    )
-    .forEach(
-      p =>
-        grid.append(
-          card(p)
-        )
-    );
-
-
-  $('#loadMore').hidden =
-    visibleCount >=
-    filtered.length;
-
-
-  $('#catalogueStatus')
-    .textContent =
-      products.length
-        ? `${filtered.length} ${
-            filtered.length === 1
-              ? 'gift'
-              : 'gifts'
-          } found`
-        : '';
-
-}
 
 
 /* ============================================================
    FEATURED PRODUCTS
    ============================================================ */
 
-function renderFeatured() {
-
-  const grid =
-    $('#featuredGrid');
-
-  grid.innerHTML = '';
-
-
-  (
-    products.length
-      ? products.slice(0, 8)
-      : []
-  )
-    .forEach(
-      p =>
-        grid.append(
-          card(p)
-        )
-    );
-
-
-  if (!products.length) {
-
-    grid.innerHTML =
-      '<p class="empty-message">' +
-      'Our curated collection is arriving shortly. ' +
-      'Please check back soon.' +
-      '</p>';
-
-  }
-
-}
 
 
 /* ============================================================
    CATEGORY CARDS
    ============================================================ */
 
-function renderCategories() {
-
-  const groups =
-    [
-      ...new Set(
-        products.map(category)
-      )
-    ];
-
-
-  $('#categoryGrid').innerHTML =
-    groups.length
-
-      ? groups
-          .map(
-            c =>
-              `
-              <button
-                class="category-card"
-                data-category="${escapeHtml(c)}"
-              >
-                <h3>${escapeHtml(c)}</h3>
-
-                <p>
-                  ${
-                    products.filter(
-                      p =>
-                        category(p) === c
-                    ).length
-                  }
-                  curated gifts
-                  <span>→</span>
-                </p>
-
-              </button>
-              `
-          )
-          .join('')
-
-      : '<p class="empty-message">' +
-        'Categories will appear once the catalogue connects.' +
-        '</p>';
-
-
-  document
-    .querySelectorAll(
-      '.category-card'
-    )
-    .forEach(
-      b =>
-        b.onclick = () => {
-
-          $('#categoryFilter').value =
-            b.dataset.category;
-
-          applyFilters();
-
-          location.hash =
-            'shop';
-
-        }
-    );
-
-}
 
 
 /* ============================================================
    CATEGORY ICON
    ============================================================ */
 
-function categoryIcon(
-  name,
-  index
-) {
-
-  const icons = [
-    '🎁',
-    '💐',
-    '✨',
-    '🏵️',
-    '🪔',
-    '🎀',
-    '🌸',
-    '💝',
-    '🎉',
-    '🕯️'
-  ];
-
-  return icons[
-    index % icons.length
-  ];
-
-}
 
 
 /* ============================================================
@@ -792,192 +643,17 @@ function escapeHtml(t) {
    POPULATE CATALOGUE FILTERS
    ============================================================ */
 
-function populateFilters() {
-
-  const cats =
-    [
-      ...new Set(
-        products.map(category)
-      )
-    ].sort();
-
-
-  $('#categoryFilter').innerHTML =
-    '<option value="">All categories</option>' +
-
-    cats
-      .map(
-        x =>
-          `<option>${escapeHtml(x)}</option>`
-      )
-      .join('');
-
-
-  updateSubcategories();
-
-}
 
 
 /* ============================================================
    UPDATE SUBCATEGORIES
    ============================================================ */
 
-function updateSubcategories() {
-
-  const cat =
-    $('#categoryFilter').value;
-
-
-  const subs =
-    [
-      ...new Set(
-        products
-          .filter(
-            p =>
-              !cat ||
-              category(p) === cat
-          )
-          .map(
-            subcategory
-          )
-          .filter(Boolean)
-      )
-    ].sort();
-
-
-  $('#subcategoryFilter').innerHTML =
-    '<option value="">All sub-categories</option>' +
-
-    subs
-      .map(
-        x =>
-          `<option>${escapeHtml(x)}</option>`
-      )
-      .join('');
-
-}
-
 
 /* ============================================================
    MAIN CATALOGUE FILTERS
    ============================================================ */
 
-function applyFilters() {
-
-  const q =
-    $('#searchInput')
-      .value
-      .toLowerCase()
-      .trim();
-
-  const cat =
-    $('#categoryFilter').value;
-
-  const sub =
-    $('#subcategoryFilter').value;
-
-  const sort =
-    $('#sortSelect').value;
-
-
-  filtered =
-    products.filter(
-      p => {
-
-        const hay =
-          [
-            productName(p),
-            productCode(p),
-            productId(p),
-            category(p),
-            subcategory(p)
-          ]
-            .join(' ')
-            .toLowerCase();
-
-
-        return (
-          (!q ||
-            hay.includes(q)) &&
-
-          (!cat ||
-            category(p) === cat) &&
-
-          (!sub ||
-            subcategory(p) === sub)
-        );
-
-      }
-    );
-
-
-  if (
-    sort ===
-    'name-asc'
-  ) {
-
-    filtered.sort(
-      (a, b) =>
-        productName(a)
-          .localeCompare(
-            productName(b)
-          )
-    );
-
-  }
-
-
-  if (
-    sort ===
-    'name-desc'
-  ) {
-
-    filtered.sort(
-      (a, b) =>
-        productName(b)
-          .localeCompare(
-            productName(a)
-          )
-    );
-
-  }
-
-
-  if (
-    sort ===
-    'price-asc'
-  ) {
-
-    filtered.sort(
-      (a, b) =>
-        priceOf(a) -
-        priceOf(b)
-    );
-
-  }
-
-
-  if (
-    sort ===
-    'price-desc'
-  ) {
-
-    filtered.sort(
-      (a, b) =>
-        priceOf(b) -
-        priceOf(a)
-    );
-
-  }
-
-
-  visibleCount =
-    PAGE_SIZE;
-
-
-  renderProducts();
-
-}
 
 
 /* ============================================================
@@ -1521,8 +1197,6 @@ function renderSideFilters() {
       button.onclick = () => {
         homeMaterial = button.dataset.material;
         homeOccasion = '';
-        homeCategory = '';
-        homeSubcategory = '';
         homePage = 1;
         renderHomeCategories();
         renderSideFilters();
@@ -1540,8 +1214,6 @@ function renderSideFilters() {
       button.onclick = () => {
         homeOccasion = button.dataset.occasion;
         homeMaterial = '';
-        homeCategory = '';
-        homeSubcategory = '';
         homePage = 1;
         renderHomeCategories();
         renderSideFilters();
@@ -1631,8 +1303,6 @@ function renderHeaderFilterMenus() {
     button.onclick = () => {
       homeMaterial = button.dataset.headerMaterial;
       homeOccasion = '';
-      homeCategory = '';
-      homeSubcategory = '';
       homePage = 1;
       closeHeaderFilterMenus();
       renderHomeCategories();
@@ -1645,8 +1315,6 @@ function renderHeaderFilterMenus() {
     button.onclick = () => {
       homeOccasion = button.dataset.headerOccasion;
       homeMaterial = '';
-      homeCategory = '';
-      homeSubcategory = '';
       homePage = 1;
       closeHeaderFilterMenus();
       renderHomeCategories();
@@ -1672,10 +1340,6 @@ function setProducts(data) {
           []
     )
       .filter(active);
-
-
-  filtered =
-    [...products];
 
 
   renderHeaderFilterMenus();
@@ -2306,12 +1970,7 @@ function configureStore() {
 
 
 /* ============================================================
-   HOME CATEGORY / PRODUCT SECTION
-   OPTION 5 PRICE FILTER
-   ============================================================ */
-/* ============================================================
-   HOME CATEGORY / PRODUCT SECTION
-   CUSTOM PRICE FILTER ONLY
+   HOME PRODUCT FILTERING
    ============================================================ */
 
 function renderAppliedFilters() {
@@ -2354,8 +2013,15 @@ function renderAppliedFilters() {
   container.innerHTML = `
     <span class="applied-filters-label">Applied Filters:</span>
     ${filters.map(filter => `
-      <button type="button" class="filter-chip" data-remove-filter="${filter.type}">
-        <span>${escapeHtml(filter.label)}</span><b aria-hidden="true">×</b>
+      <button
+        type="button"
+        class="filter-chip"
+        data-remove-filter="${filter.type}"
+        aria-label="${escapeHtml(`Remove ${filter.label}`)}"
+        title="Remove filter"
+      >
+        <span>${escapeHtml(filter.label)}</span>
+        <b aria-hidden="true">×</b>
       </button>
     `).join('')}
     <button type="button" class="clear-filters" id="clearAllFilters">Clear All</button>
@@ -2380,8 +2046,6 @@ function renderAppliedFilters() {
   $('#clearAllFilters')?.addEventListener('click', () => {
     homeMaterial = '';
     homeOccasion = '';
-    homeCategory = '';
-    homeSubcategory = '';
     homeMinPrice = 0;
     homeMaxPrice = null;
     const input = $('#homeSearchInput');
@@ -2531,21 +2195,6 @@ function renderHomeCategories() {
 
         return (
 
-          (
-            !homeCategory ||
-            category(p) ===
-              homeCategory
-          )
-
-          &&
-
-          (
-            !homeSubcategory ||
-            subcategory(p) ===
-              homeSubcategory
-          )
-
-          &&
 
           (
             !homeMaterial ||
@@ -2678,29 +2327,30 @@ function renderHomeCategories() {
      ---------------------------------------------------------- */
 
   $('#homeProductsHeading').innerHTML = `
-    <div class="products-heading-left">
-      <h3>
-        All Items
-        <span>
-          ${shown.length}
-          ${shown.length === 1 ? 'gift' : 'gifts'}
-        </span>
-      </h3>
+    <div class="products-heading-row">
+      <div class="products-heading-left">
+        <h3>
+          All Items
+          <span>
+            ${shown.length}
+            ${shown.length === 1 ? 'gift' : 'gifts'}
+          </span>
+        </h3>
+      </div>
 
-      <div class="applied-filters" id="appliedFilters"></div>
+      <div class="products-heading-right">
+        <label class="sort-label">Sort by</label>
+        <select id="homeSortSelect" aria-label="Sort products">
+          <option value="default">Sort: Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="name-asc">Name: A–Z</option>
+          <option value="name-desc">Name: Z–A</option>
+        </select>
+      </div>
     </div>
 
-    <div class="products-heading-right">
-      <label class="sort-label">Sort by</label>
-
-      <select id="homeSortSelect" aria-label="Sort products">
-        <option value="default">Sort: Featured</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="name-asc">Name: A–Z</option>
-        <option value="name-desc">Name: Z–A</option>
-      </select>
-    </div>
+    <div class="applied-filters" id="appliedFilters"></div>
   `;
 
   renderAppliedFilters();
@@ -3043,7 +2693,6 @@ function renderHomeCategories() {
 
   document
     .querySelectorAll(
-      '#homePaginationTop button[data-page],' +
       '#homePagination button[data-page]'
     )
     .forEach(
@@ -3300,8 +2949,6 @@ function init() {
         homeOccasion = '';
         homeMaterial = '';
       }
-      homeCategory = '';
-      homeSubcategory = '';
       homePage = 1;
       renderHomeCategories();
       renderSideFilters();
@@ -3368,19 +3015,32 @@ function init() {
     /* Collapse / expand Material, Occasion and Price Range. */
     side.querySelectorAll('.side-filter-heading').forEach(heading => {
 
-      const content = heading.nextElementSibling;
-      if (!content) return;
+  const content = heading.nextElementSibling;
+  if (!content) return;
 
-      heading.onclick = e => {
-        e.preventDefault();
-        e.stopPropagation();
+  // Collapsed by default
+  heading.setAttribute('aria-expanded', 'false');
+  content.classList.add('collapsed');
 
-        const expanded = heading.getAttribute('aria-expanded') !== 'false';
-        heading.setAttribute('aria-expanded', String(!expanded));
-        content.classList.toggle('collapsed', expanded);
-      };
+  heading.onclick = e => {
+    e.preventDefault();
+    e.stopPropagation();
 
-    });
+    const isExpanded =
+      heading.getAttribute('aria-expanded') === 'true';
+
+    heading.setAttribute(
+      'aria-expanded',
+      String(!isExpanded)
+    );
+
+    content.classList.toggle(
+      'collapsed',
+      isExpanded
+    );
+  };
+
+});
 
     /* Normal side navigation closes the menu. Terms is handled separately. */
     side.querySelectorAll('nav a:not([data-open-terms])').forEach(a => {
