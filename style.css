@@ -1636,3 +1636,43 @@ footer div a {
 .header-actions {
   margin-left: auto;
 }
+/* ============================================================
+   MOBILE - SHOW ACTIVE FILTERS ABOVE PRODUCTS
+   ============================================================ */
+
+@media (max-width: 620px) {
+
+  .home-products-heading {
+    position: relative;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100%;
+  }
+
+  .applied-filters {
+    position: static !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 7px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .filter-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    white-space: nowrap !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .filter-chip button {
+    display: inline-flex !important;
+    visibility: visible !important;
+  }
+}
