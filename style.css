@@ -1379,11 +1379,10 @@ footer div a {
   .header-actions .whatsapp-pill {
     display: none;
   }
-
-  .header-search {
-    width: 112px;
-    height: 34px;
-  }
+.header-search {
+  width: 180px;
+  height: 34px;
+}
 
   .header-search input {
     font-size: 11px;
@@ -1679,57 +1678,7 @@ footer div a {
    MOBILE HEADER - PREVENT RIGHT SIDE OVERFLOW
    ============================================================ */
 
-@media (max-width: 620px) {
-
-  .site-header {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    gap: 10px;
-  }
-
-  .site-header .brand {
-    flex: 0 0 auto;
-    min-width: 0;
-  }
-
-  .site-header .brand > span:last-child {
-    min-width: 0;
-  }
-
-  .site-header .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 0;
-    margin-left: auto;
-  }
-
-  /* Hide the large search box on mobile */
-  .site-header .header-search {
-    width: 36px;
-    flex: 0 0 36px;
-  }
-
-  .site-header .header-search input {
-    display: none;
-  }
-
-  /* Make Bag compact */
-  .site-header .cart-trigger {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding: 8px 10px;
-  }
-
-  /* Make WhatsApp fit */
-  .site-header .whatsapp-pill {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding: 8px 10px;
-  }
-}@media (max-width: 420px) {
+@media (max-width: 420px) {
   .site-header {
     gap: 6px;
   }
