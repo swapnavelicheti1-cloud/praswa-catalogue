@@ -1748,3 +1748,31 @@ footer div a {
     font-size: 12px;
   }
 }
+
+/* ============================================================
+   MOBILE SEARCH - LARGER SEARCH BAR
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .header-search {
+    width: 210px;
+    height: 44px;
+    padding: 0 14px;
+    gap: 8px;
+    border-radius: 99px;
+  }
+
+  .header-search input {
+    font-size: 14px;
+  }
+
+  .header-search span {
+    font-size: 20px;
+  }
+
+}@media (max-width: 480px) {
+  .header-search {
+    width: 190px;
+  }
+}
