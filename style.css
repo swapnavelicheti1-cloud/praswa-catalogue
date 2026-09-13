@@ -1823,3 +1823,16 @@ footer div a {
     height: 18px;
   }
 }
+/* FIX CART CIRCLE - MOBILE */
+@media (max-width: 620px) {
+  .site-header .cart-trigger {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    padding: 0 !important;
+    flex: 0 0 42px !important;
+    border-radius: 50% !important;
+    box-sizing: border-box !important;
+  }
+}
