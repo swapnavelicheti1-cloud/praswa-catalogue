@@ -1915,3 +1915,177 @@ footer div a {
   border: 1px solid var(--plum) !important;
   border-radius: 999px;
 }
+
+/* ============================================================
+   BRAND LOGOS - Logo.png
+   ============================================================ */
+
+/* Header: Logo.png replaces the old P circle completely. */
+.site-header .brand-mark {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-header .brand-mark img {
+  width: 56px;
+  height: 56px;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Side menu: complete Logo.png + PRASWA GIFTS on one line. */
+.side-menu .side-menu-brand {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+  margin-bottom: 28px !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+}
+
+.side-menu .side-menu-logo {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  flex: 0 0 56px !important;
+  display: block !important;
+}
+
+.side-menu .side-menu-logo img {
+  width: 56px !important;
+  height: 56px !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+.side-menu .side-menu-brand-text {
+  display: block !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+
+.side-menu .side-menu-brand-text strong {
+  display: block !important;
+  white-space: nowrap !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+}
+
+.side-menu .side-menu-brand-text small {
+  display: block !important;
+  white-space: nowrap !important;
+  margin-top: 5px !important;
+  font-size: 8px !important;
+  line-height: 1.2 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+}
+
+/* Footer: complete Logo.png + existing brand text. */
+.footer-brand {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+
+.footer-logo {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  flex: 0 0 56px !important;
+  display: block !important;
+  object-fit: contain !important;
+}
+
+/* Mobile logo sizes */
+@media (max-width: 768px) {
+  .site-header .brand-mark,
+  .site-header .brand-mark img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .site-header .brand-mark {
+    flex-basis: 42px;
+  }
+
+  .side-menu .side-menu-logo,
+  .side-menu .side-menu-logo img {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .footer-logo {
+    width: 56px !important;
+    height: 56px !important;
+  }
+}.side-menu-brand {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.side-menu-logo {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  flex: 0 0 52px !important;
+}
+
+.side-menu-logo img {
+  width: 52px !important;
+  height: 52px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+.side-menu-brand-text {
+  white-space: nowrap !important;
+  display: block !important;
+}
+.side-menu-brand-text strong {
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  white-space: nowrap !important;
+}
+
+/* GIFTS should NOT be bold */
+.side-menu-gifts {
+  font-family: "DM Sans", sans-serif !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  letter-spacing: 1px !important;
+}
+
+.side-menu-brand-text small {
+  display: block !important;
+  margin-top: 5px !important;
+  font-size: 8px !important;
+  letter-spacing: 1px !important;
+  white-space: nowrap !important;
+}
+
+.side-menu .brand-mark {
+  display: none !important;
+}
