@@ -1835,4 +1835,83 @@ footer div a {
     border-radius: 50% !important;
     box-sizing: border-box !important;
   }
+}/* ============================================================
+   PRODUCT POPUP - FIX CLOSE BUTTON & ADD TO BAG BORDER
+   ============================================================ */
+
+/* Close button */
+#productModal .modal-close {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 2px solid var(--plum);
+  border-radius: 50%;
+  background: #fffaf5;
+  color: var(--plum);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* Add to Bag button */
+#productModal .add-cart {
+  border: 1px solid var(--plum) !important;
+  background: #fffaf5 !important;
+  color: var(--plum) !important;
+  border-radius: 999px;
+  box-sizing: border-box;
+}
+
+/* Keep button border visible on hover/focus */
+#productModal .add-cart:hover,
+#productModal .add-cart:focus {
+  border: 1px solid var(--plum) !important;
+  outline: none;
+}/* Hide WhatsApp button on top of the product popup image */
+#productModal .modal-whatsapp {
+  display: none !important;
+}
+/* PRODUCT POPUP - QUANTITY + ADD TO BAG */
+
+#productModal .modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Wider + / - quantity control */
+#productModal .product-quantity {
+  width: 120px !important;
+  min-width: 120px !important;
+  height: 44px !important;
+  display: flex;
+  align-items: center;
+}
+
+#productModal .product-quantity button {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 42px !important;
+  font-size: 18px;
+}
+
+#productModal .product-quantity input {
+  width: 44px !important;
+  height: 42px !important;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Smaller Add to Bag button */
+#productModal .add-cart {
+  width: 130px !important;
+  min-width: 130px !important;
+  height: 44px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  border: 1px solid var(--plum) !important;
+  border-radius: 999px;
 }
