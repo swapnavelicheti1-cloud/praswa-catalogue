@@ -1807,9 +1807,10 @@ footer div a {
     position: relative;
     display: grid;
     place-items: center;
-    width: 56px;
-    height: 56px;
+    width: 42px;
+    height: 42px;
     padding: 0;
+    flex: 0 0 42px;
     border-radius: 50%;
     font-size: 0;
   }
@@ -1820,9 +1821,5 @@ footer div a {
     margin: 0;
     min-width: 18px;
     height: 18px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    font-size: 10px;
   }
 }
