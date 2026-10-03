@@ -3099,16 +3099,96 @@ function init() {
 
 
   /* ----------------------------------------------------------
-     TERMS & CONDITIONS POPUP
+     POLICIES POPUP
      ---------------------------------------------------------- */
 
-  document.querySelectorAll('[data-open-terms]').forEach(link => {
+  const policyContent = {
+    terms: {
+      eyebrow: 'Please note',
+      title: 'Terms & <em>Conditions</em>',
+      sections: [
+        ['Orders & Customisation', 'Most products can be customised based on your requirements. Please verify names, spellings, colours, quantities and other customisation details before confirming an order. Changes may not be possible once customised production has started.'],
+        ['Orders & Confirmation', 'Orders are confirmed after the required payment/advance and final details are received. Some products may have a minimum order quantity (MOQ), as shown on the product page or communicated before confirmation.'],
+        ['Pricing & Payment', 'Prices may change without prior notice. Customisation, packaging, delivery or other applicable charges may be added to the final order price. Advance payments for customised orders may become non-refundable once production has started.'],
+        ['Product Availability', 'Products, colours, materials and accessories are subject to availability. If a specific component becomes unavailable, a suitable alternative may be offered after discussion with the customer.'],
+        ['Product Appearance', 'Product images are for reference. Slight differences in colour, texture, size or appearance may occur due to lighting, screens, materials and handmade/customised production.'],
+        ['Cancellation, Returns & Exchanges', 'Cancellation requests must be made as early as possible. Customised products generally cannot be returned or exchanged once production has started. If you receive a damaged, defective or incorrect product, please contact us within 24 hours of delivery with clear photos/videos.'],
+        ['Delivery', 'Delivery timelines are estimates and may vary depending on customisation, quantity, availability and courier services. Customers are responsible for providing a complete and accurate delivery address and contact number.'],
+        ['Customer Information', 'Customers are responsible for the accuracy of names, spellings, addresses, photographs, designs and other information supplied for an order.'],
+        ['Customer-Provided Content', 'By providing photographs, logos, names or other content for customisation, the customer confirms that they have the necessary permission to use that content.'],
+        ['Intellectual Property', 'Praswa Gifts retains rights in its original photographs, graphics, catalogue content, designs and branding unless otherwise stated. These materials may not be copied or commercially used without permission.'],
+        ['Promotional Use', 'With the customer’s consent where appropriate, photographs of completed products may be used by Praswa Gifts for promotional purposes. Customers may request that their personalised photographs/details not be used.'],
+        ['Force Majeure', 'Praswa Gifts is not responsible for delays caused by circumstances beyond reasonable control, including natural events, transportation disruptions, government restrictions, strikes, technical failures or other unforeseen events.'],
+        ['Acceptance', 'By placing an order with Praswa Gifts, the customer acknowledges that they have read, understood and agreed to the applicable Terms & Conditions.']
+      ]
+    },
+    privacy: {
+      eyebrow: 'Your information',
+      title: 'Privacy <em>Policy</em>',
+      sections: [
+        ['Information We Receive', 'We may receive information you provide while making an enquiry or order, such as your name, phone number, delivery address, email address and customisation details.'],
+        ['How We Use Information', 'We use order information to respond to enquiries, prepare and deliver orders, communicate about order status and provide customer support.'],
+        ['Payment Information', 'Where payment is handled through a third-party payment provider, payment processing is subject to that provider’s terms and privacy practices.'],
+        ['Sharing Information', 'We may share necessary delivery details with service providers such as courier partners when required to fulfil an order. We do not needlessly share customer information for unrelated purposes.'],
+        ['Customer-Provided Photos', 'Photos or other personal content submitted for customisation are used for fulfilling the requested service. Please tell us if you do not want completed personalised work used for promotional purposes.'],
+        ['Data Security', 'We take reasonable steps to protect customer information, but no online transmission or storage method can be guaranteed to be completely secure.'],
+        ['Contact', 'For privacy-related questions or requests, please contact Praswa Gifts using the contact details provided on the website.']
+      ]
+    },
+    refund: {
+      eyebrow: 'Before confirming',
+      title: 'Cancellation & <em>Refund</em>',
+      sections: [
+        ['Cancellation Before Production', 'Please contact us as soon as possible if you need to cancel an order. If production or procurement has not started, we will review the cancellation and applicable refund based on the order status.'],
+        ['Customised Orders', 'Once customisation, printing, engraving, preparation or procurement has started, cancellation may not be possible and advance payments may be non-refundable.'],
+        ['Damaged or Incorrect Products', 'If an order arrives damaged, defective or different from what was confirmed, contact us within 24 hours of delivery with clear photos/videos. We will review the issue and provide an appropriate resolution where applicable.'],
+        ['Returns & Exchanges', 'Because customised products are made specifically for the customer, customised products generally cannot be returned or exchanged unless there is a verified defect, damage or fulfilment error.'],
+        ['Refund Processing', 'Where a refund is approved, the method and timing will depend on the original payment method and applicable payment-provider or banking timelines.']
+      ]
+    },
+    shipping: {
+      eyebrow: 'Order delivery',
+      title: 'Shipping & <em>Delivery</em>',
+      sections: [
+        ['Processing Time', 'Processing time depends on the product, quantity, customisation and material availability. Bulk and customised orders may require additional preparation time.'],
+        ['Delivery Estimates', 'Delivery dates are estimates rather than guaranteed dates unless specifically confirmed. Courier delays, weather, holidays and other circumstances may affect delivery.'],
+        ['Address Accuracy', 'Please provide a complete delivery address, PIN code and reachable phone number. Delays or failed deliveries caused by incorrect or incomplete details may require additional delivery arrangements or charges.'],
+        ['Courier Delays', 'Once an order has been handed to the courier, delivery is subject to the courier’s network and operating conditions. We will assist with tracking and coordination where possible.'],
+        ['Transit Damage', 'Please inspect the package when received. If the product is damaged during transit, contact us within 24 hours with clear photos/videos of the outer package and product.'],
+        ['Shipping Charges', 'Applicable delivery/shipping charges will be communicated before final order confirmation when they are not already included in the product price.']
+      ]
+    }
+  };
+
+  function openPolicy(policy = 'terms') {
+    const data = policyContent[policy] || policyContent.terms;
+    const modal = $('#termsModal');
+    if (!modal) return;
+
+    const eyebrow = $('#policyEyebrow');
+    const title = $('#policyTitle');
+    const content = $('#policyContent');
+
+    if (eyebrow) eyebrow.textContent = data.eyebrow;
+    if (title) title.innerHTML = data.title;
+    if (content) {
+      content.innerHTML = data.sections.map((section, index) => `
+        <details class="policy-item" ${index === 0 ? 'open' : ''}>
+          <summary>${escapeHtml(section[0])}<span aria-hidden="true">+</span></summary>
+          <div class="policy-item-body">${escapeHtml(section[1])}</div>
+        </details>
+      `).join('');
+    }
+
+    if (!modal.open) modal.showModal();
+  }
+
+  document.querySelectorAll('[data-open-policy]').forEach(link => {
     link.onclick = e => {
       e.preventDefault();
       e.stopPropagation();
       closeSideMenu();
-      const modal = $('#termsModal');
-      if (modal && !modal.open) modal.showModal();
+      openPolicy(link.dataset.openPolicy || 'terms');
     };
   });
 
