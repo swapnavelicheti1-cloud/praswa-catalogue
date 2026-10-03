@@ -1012,6 +1012,18 @@ function closeSideMenu() {
 
   side.classList.remove('open');
 
+  // Restore the page exactly where the user was before opening the menu.
+  if (document.body.classList.contains('menu-open')) {
+    const scrollY = Number(document.body.dataset.menuScrollY || 0);
+    document.body.classList.remove('menu-open');
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, scrollY);
+    delete document.body.dataset.menuScrollY;
+  }
+
   if (backdrop) {
     backdrop.classList.remove('open');
   }
@@ -1030,6 +1042,16 @@ function openSideMenu() {
   const menuButton = $('.menu-toggle');
 
   if (!side) return;
+
+  // Freeze the page underneath the drawer on desktop and mobile.
+  if (!document.body.classList.contains('menu-open')) {
+    document.body.dataset.menuScrollY = String(window.scrollY);
+    document.body.classList.add('menu-open');
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${window.scrollY}px`;
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+  }
 
   side.classList.add('open');
 

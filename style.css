@@ -2089,3 +2089,9 @@ footer div a {
 .side-menu .brand-mark {
   display: none !important;
 }
+/* Keep the page underneath the side drawer completely fixed on ALL screen sizes. */
+body.menu-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
