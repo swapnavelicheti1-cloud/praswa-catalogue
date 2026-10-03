@@ -47,6 +47,15 @@ const HOME_PAGE_SIZE = 12;
 let products = [];
 let cart = [];
 
+// Precomputed catalogue indexes. These avoid repeatedly scanning every product
+// while building the header/sidebar filters and applying the main filter.
+let productIndex = {
+  materialCounts: new Map(),
+  occasionCounts: new Map(),
+  materials: [],
+  occasions: []
+};
+
 /* Load product images only when they are near the viewport. */
 const lazyImageObserver =
   'IntersectionObserver' in window
@@ -66,7 +75,7 @@ const lazyImageObserver =
             lazyImageObserver.unobserve(img);
           });
         },
-        { rootMargin: '250px 0px' }
+        { rootMargin: '100px 0px' }
       )
     : null;
 
@@ -210,6 +219,45 @@ const value = (p, ...keys) => {
   );
 
 };
+
+
+/* ============================================================
+   MULTIPLE OCCASIONS
+   ------------------------------------------------------------
+   Supports multiple values in the existing Occasion column.
+   Preferred separator: | (also accepts comma/semicolon).
+   Example: Wedding | Birthday | Baby Functions
+   ============================================================ */
+const occasionValuesCache = new WeakMap();
+
+function occasionValues(p) {
+  if (p && typeof p === 'object') {
+    const cached = occasionValuesCache.get(p);
+    if (cached) return cached;
+  }
+
+  const raw = clean(value(p, 'Occasion', 'occasion'));
+  const result = raw
+    ? raw
+        .split(/[|;,]+/)
+        .map(item => item.trim())
+        .filter(Boolean)
+    : [];
+
+  if (p && typeof p === 'object') {
+    occasionValuesCache.set(p, result);
+  }
+
+  return result;
+}
+
+function hasOccasion(p, selectedOccasion) {
+  const selected = clean(selectedOccasion).toLowerCase();
+  if (!selected) return true;
+  return occasionValues(p).some(
+    occasion => occasion.toLowerCase() === selected
+  );
+}
 
 
 const productName = p =>
@@ -1204,13 +1252,7 @@ function renderSideFilters() {
      MATERIAL LIST
      ---------------------------------------------------------- */
 
-  const materials = [
-    ...new Set(
-      products
-        .map(p => value(p, 'Material', 'material'))
-        .filter(Boolean)
-    )
-  ].sort((a, b) => a.localeCompare(b));
+  const materials = productIndex.materials;
 
   materialMenu.innerHTML = `
     <button
@@ -1223,9 +1265,7 @@ function renderSideFilters() {
     </button>
 
     ${materials.map(name => {
-      const count = products.filter(
-        p => value(p, 'Material', 'material') === name
-      ).length;
+      const count = productIndex.materialCounts.get(name) || 0;
 
       return `
         <button
@@ -1244,13 +1284,7 @@ function renderSideFilters() {
      OCCASION LIST
      ---------------------------------------------------------- */
 
-  const occasionList = [
-    ...new Set(
-      products
-        .map(p => value(p, 'Occasion', 'occasion'))
-        .filter(Boolean)
-    )
-  ].sort((a, b) => a.localeCompare(b));
+  const occasionList = productIndex.occasions;
 
   occasionMenu.innerHTML = `
     <button
@@ -1263,9 +1297,7 @@ function renderSideFilters() {
     </button>
 
     ${occasionList.map(name => {
-      const count = products.filter(
-        p => value(p, 'Occasion', 'occasion') === name
-      ).length;
+      const count = productIndex.occasionCounts.get(name) || 0;
 
       return `
         <button
@@ -1406,22 +1438,17 @@ function renderHeaderFilterMenus() {
   const occasionMenu = $('#headerOccasionMenu');
   if (!materialMenu || !occasionMenu) return;
 
-  const materials = [...new Set(
-    products.map(p => value(p, 'Material', 'material')).filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b));
-
-  const occasions = [...new Set(
-    products.map(p => value(p, 'Occasion', 'occasion')).filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b));
+  const materials = productIndex.materials;
+  const occasions = productIndex.occasions;
 
   materialMenu.innerHTML = `
     <button type="button" data-header-material=""><span>All Items</span><span>${products.length}</span></button>
-    ${materials.map(name => `<button type="button" data-header-material="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><span>${products.filter(p => value(p, 'Material', 'material') === name).length}</span></button>`).join('')}
+    ${materials.map(name => `<button type="button" data-header-material="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><span>${productIndex.materialCounts.get(name) || 0}</span></button>`).join('')}
   `;
 
   occasionMenu.innerHTML = `
     <button type="button" data-header-occasion=""><span>All Items</span><span>${products.length}</span></button>
-    ${occasions.map(name => `<button type="button" data-header-occasion="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><span>${products.filter(p => value(p, 'Occasion', 'occasion') === name).length}</span></button>`).join('')}
+    ${occasions.map(name => `<button type="button" data-header-occasion="${escapeHtml(name)}"><span>${escapeHtml(name)}</span><span>${productIndex.occasionCounts.get(name) || 0}</span></button>`).join('')}
   `;
 
   materialMenu.querySelectorAll('[data-header-material]').forEach(button => {
@@ -1466,6 +1493,47 @@ function setProducts(data) {
     )
       .filter(active);
 
+  // Build all filter/search metadata once when products arrive.
+  // Rendering and filtering can then use O(1) lookups instead of repeatedly
+  // scanning/parsing the full product list.
+  const materialCounts = new Map();
+  const occasionCounts = new Map();
+  const materialSet = new Set();
+  const occasionSet = new Set();
+
+  products.forEach(p => {
+    const material = value(p, 'Material', 'material');
+    if (material) {
+      materialSet.add(material);
+      materialCounts.set(material, (materialCounts.get(material) || 0) + 1);
+    }
+
+    const occasionsForProduct = occasionValues(p);
+    occasionsForProduct.forEach(occasion => {
+      occasionSet.add(occasion);
+      occasionCounts.set(occasion, (occasionCounts.get(occasion) || 0) + 1);
+    });
+
+    // Cache the expensive generic field lookups used by the main catalogue.
+    p.__pgSearchText = [
+      productName(p),
+      productCode(p),
+      productId(p),
+      category(p),
+      subcategory(p),
+      material,
+      value(p, 'Occasion', 'occasion')
+    ].join(' ').toLowerCase();
+    p.__pgPrice = priceOf(p);
+    p.__pgMaterial = material;
+  });
+
+  productIndex = {
+    materialCounts,
+    occasionCounts,
+    materials: [...materialSet].sort((a, b) => a.localeCompare(b)),
+    occasions: [...occasionSet].sort((a, b) => a.localeCompare(b))
+  };
 
   renderHeaderFilterMenus();
 
@@ -2173,7 +2241,7 @@ function renderHomeCategories() {
     Math.max(
       25000,
       ...products
-        .map(priceOf)
+        .map(p => p.__pgPrice ?? priceOf(p))
         .filter(
           price =>
             price > 0
@@ -2241,22 +2309,8 @@ function renderHomeCategories() {
     products.filter(
       p => {
 
-        const hay =
-          [
-            productName(p),
-            productCode(p),
-            productId(p),
-            category(p),
-            subcategory(p),
-            value(p, 'Material', 'material'),
-            value(p, 'Occasion', 'occasion')
-          ]
-            .join(' ')
-            .toLowerCase();
-
-
-        const price =
-          priceOf(p);
+        const hay = p.__pgSearchText || '';
+        const price = p.__pgPrice ?? priceOf(p);
 
 
         /*
@@ -2286,7 +2340,7 @@ function renderHomeCategories() {
 
           (
             !homeMaterial ||
-            value(p, 'Material', 'material') ===
+            (p.__pgMaterial ?? value(p, 'Material', 'material')) ===
               homeMaterial
           )
 
@@ -2294,8 +2348,7 @@ function renderHomeCategories() {
 
           (
             !homeOccasion ||
-            value(p, 'Occasion', 'occasion') ===
-              homeOccasion
+            hasOccasion(p, homeOccasion)
           )
 
           &&
