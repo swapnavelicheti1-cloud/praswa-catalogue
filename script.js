@@ -280,7 +280,7 @@ function priceOf(p) {
 
   const n =
     Number(
-      raw.replace(
+      String(raw || '').replace(
         /[^0-9.]/g,
         ''
       )
@@ -292,7 +292,79 @@ function priceOf(p) {
 }
 
 
-function priceLabel(p) {
+/* ============================================================
+   SIZE-WISE PRICING
+   ------------------------------------------------------------
+   Optional Google Sheet column: SizePrices
+
+   Examples:
+     4"=100, 5"=120, 6"=130
+     7x4=100, 8x5=130
+     7 × 4: 100; 8 × 5: 130
+     {"4"":100,"5"":120,"6"":130}
+
+   Products without SizePrices continue using the normal Price
+   column exactly as before.
+   ============================================================ */
+
+function sizePriceMap(p) {
+
+  const raw = clean(
+    value(
+      p,
+      'SizePrices',
+      'sizePrices',
+      'Size Price',
+      'size price'
+    )
+  );
+
+  if (!raw) return {};
+
+  const result = {};
+
+  // JSON object support.
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      Object.entries(parsed).forEach(([size, price]) => {
+        const n = Number(String(price).replace(/[^0-9.]/g, ''));
+        if (size && Number.isFinite(n)) result[String(size).trim()] = n;
+      });
+      if (Object.keys(result).length) return result;
+    }
+  } catch {}
+
+  // Human-friendly format: size=price, size:price, size-price.
+  raw
+    .split(/[;,\n]+/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .forEach(part => {
+      const match = part.match(/^(.+?)\s*(?:=|:|\s+-\s+)\s*₹?\s*([0-9]+(?:\.[0-9]+)?)\s*$/);
+      if (!match) return;
+
+      const size = match[1].trim();
+      const price = Number(match[2]);
+      if (size && Number.isFinite(price)) result[size] = price;
+    });
+
+  return result;
+}
+
+function sizeOptions(p) {
+  return Object.keys(sizePriceMap(p));
+}
+
+function sizePrice(p, selectedSize = '') {
+  const map = sizePriceMap(p);
+  const key = String(selectedSize || '').trim();
+  return key && Number.isFinite(map[key])
+    ? map[key]
+    : priceOf(p);
+}
+
+function priceLabel(p, selectedSize = '') {
 
   const raw =
     value(
@@ -302,11 +374,11 @@ function priceLabel(p) {
     );
 
   const price =
-    priceOf(p);
+    sizePrice(p, selectedSize);
 
-  return raw && price
+  return price > 0
     ? `₹${price.toLocaleString('en-IN')}`
-    : 'Price on request';
+    : (raw ? 'Price on request' : 'Price on request');
 }
 
 
@@ -454,10 +526,38 @@ function card(p) {
       : 'Customised return gift';
 
 
-  node.querySelector(
-    '.product-price'
-  ).textContent =
-    priceLabel(p);
+  /*
+     Always show a Size control on every product card so all cards
+     keep the same vertical layout. Products with SizePrices get
+     selectable sizes; products with only a normal Size value show
+     that value as the default (disabled) selection.
+  */
+  const sizeChoices = sizeOptions(p);
+  const fixedSize = value(p, 'Size', 'size') || 'Standard';
+  let selectedSize = sizeChoices[0] || '';
+
+  const priceEl = node.querySelector('.product-price');
+  const wrap = document.createElement('label');
+  wrap.className = 'size-selector-wrap';
+  wrap.innerHTML = `
+    <span>Size</span>
+    <select class="size-selector" aria-label="Select size" ${sizeChoices.length ? '' : 'disabled'}>
+      ${sizeChoices.length
+        ? sizeChoices.map(size => `<option value="${escapeHtml(size)}">${escapeHtml(size)}</option>`).join('')
+        : `<option value="${escapeHtml(fixedSize)}">${escapeHtml(fixedSize)}</option>`}
+    </select>
+  `;
+  priceEl.parentNode.insertBefore(wrap, priceEl);
+
+  const select = wrap.querySelector('.size-selector');
+  priceEl.textContent = priceLabel(p, selectedSize);
+
+  if (sizeChoices.length) {
+    select.onchange = () => {
+      selectedSize = select.value;
+      priceEl.textContent = priceLabel(p, selectedSize);
+    };
+  }
 
 
   const minimum =
@@ -554,7 +654,7 @@ function card(p) {
   node.querySelector(
     '.product-image'
   ).onclick = () =>
-    openProduct(p);
+    openProduct(p, selectedSize);
 
 
   node.querySelector(
@@ -562,7 +662,8 @@ function card(p) {
   ).onclick = () =>
     addToCart(
       p,
-      quantity
+      quantity,
+      selectedSize
     );
 
   observeLazyImage(img);
@@ -636,7 +737,7 @@ function escapeHtml(t) {
    PRODUCT DETAILS MODAL
    ============================================================ */
 
-function openProduct(p) {
+function openProduct(p, initialSize = '') {
 
   const imgs =
     imagesOf(p);
@@ -757,9 +858,21 @@ function openProduct(p) {
 
         <p class="modal-price">
           ${escapeHtml(
-            priceLabel(p)
+            priceLabel(p, initialSize || sizeOptions(p)[0] || '')
           )}
         </p>
+
+
+        ${`
+          <label class="modal-size-selector-wrap">
+            <span>Size</span>
+            <select class="modal-size-selector" aria-label="Select size" ${sizeOptions(p).length ? '' : 'disabled'}>
+              ${sizeOptions(p).length
+                ? sizeOptions(p).map(size => `<option value="${escapeHtml(size)}" ${size === (initialSize || sizeOptions(p)[0]) ? 'selected' : ''}>${escapeHtml(size)}</option>`).join('')
+                : `<option value="${escapeHtml(value(p, 'Size', 'size') || 'Standard')}">${escapeHtml(value(p, 'Size', 'size') || 'Standard')}</option>`}
+            </select>
+          </label>
+        `}
 
 
         <div class="detail-list">
@@ -895,6 +1008,34 @@ function openProduct(p) {
   const qty =
     $('.modal-quantity-value');
 
+  const modalSizeSelect =
+    $('.modal-size-selector');
+
+  let selectedSize =
+    modalSizeSelect?.value ||
+    initialSize ||
+    sizeOptions(p)[0] ||
+    '';
+
+  const updateModalPrice = () => {
+    const label = priceLabel(p, selectedSize);
+    $('.modal-price').textContent = label;
+
+    const detailPrice = [...document.querySelectorAll('#modalContent .detail-list > div')]
+      .find(el => el.querySelector('span')?.textContent?.trim() === 'Price')
+      ?.querySelector('b');
+    if (detailPrice) detailPrice.textContent = label;
+  };
+
+  if (modalSizeSelect) {
+    modalSizeSelect.onchange = () => {
+      selectedSize = modalSizeSelect.value;
+      updateModalPrice();
+    };
+  }
+
+  updateModalPrice();
+
 
   const normalise =
     () => {
@@ -950,7 +1091,8 @@ function openProduct(p) {
         p,
         Number(
           qty.value
-        )
+        ),
+        selectedSize
       );
 
     };
@@ -1454,13 +1596,16 @@ async function loadProducts() {
    CART KEY
    ============================================================ */
 
-function cartKey(p) {
+function cartKey(p, selectedSize = '') {
 
-  return (
+  const base =
     productId(p) ||
     productCode(p) ||
-    productName(p)
-  );
+    productName(p);
+
+  return selectedSize
+    ? `${base}::size=${String(selectedSize).trim()}`
+    : base;
 
 }
 
@@ -1488,16 +1633,21 @@ function updateCartCount() {
 
 function addToCart(
   p,
-  quantity = 1
+  quantity = 1,
+  selectedSize = ''
 ) {
 
   const item =
     cart.find(
       x =>
         cartKey(
-          x.product
+          x.product,
+          x.size || ''
         ) ===
-        cartKey(p)
+        cartKey(
+          p,
+          selectedSize
+        )
     );
 
 
@@ -1510,7 +1660,8 @@ function addToCart(
 
     cart.push({
       product: p,
-      quantity
+      quantity,
+      ...(selectedSize ? { size: selectedSize, unitPrice: sizePrice(p, selectedSize) } : {})
     });
 
   }
@@ -1541,9 +1692,7 @@ function renderCart() {
     cart.reduce(
       (n, item) =>
         n +
-        priceOf(
-          item.product
-        ) *
+        (item.unitPrice ?? priceOf(item.product)) *
         item.quantity,
       0
     );
@@ -1567,9 +1716,7 @@ function renderCart() {
                 )[0];
 
               const subtotal =
-                priceOf(
-                  item.product
-                ) *
+                (item.unitPrice ?? priceOf(item.product)) *
                 item.quantity;
 
 
@@ -1626,10 +1773,13 @@ function renderCart() {
                     </small>
 
 
+                    ${item.size ? `<span class="cart-item-size">Size: ${escapeHtml(item.size)}</span>` : ''}
+
                     <span>
                       ${escapeHtml(
                         priceLabel(
-                          item.product
+                          item.product,
+                          item.size || ''
                         )
                       )}
                       each
@@ -1852,7 +2002,8 @@ function renderCart() {
 
 
           openProduct(
-            item.product
+            item.product,
+            item.size || ''
           );
 
         }
@@ -3101,11 +3252,12 @@ function init() {
                 productName(
                   item.product
                 )
-              } × ${
+              }${item.size ? ` (${item.size})` : ''} × ${
                 item.quantity
               } — ${
                 priceLabel(
-                  item.product
+                  item.product,
+                  item.size || ''
                 )
               }`
           );
@@ -3115,9 +3267,7 @@ function init() {
           cart.reduce(
             (n, item) =>
               n +
-              priceOf(
-                item.product
-              ) *
+              (item.unitPrice ?? priceOf(item.product)) *
               item.quantity,
             0
           );
