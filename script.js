@@ -391,22 +391,6 @@ function imagesOf(p) {
 
 
 /* ============================================================
-   WHATSAPP PRODUCT LINK
-   ============================================================ */
-
-function whatsappLink(p) {
-
-  return `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-    `Hi, I'm interested in ${productName(p)} (${productCode(p)}).
-
-Please share the price and details.`
-  )}`;
-
-}
-
-
-
-/* ============================================================
    PRODUCT CARD
    ============================================================ */
 
@@ -567,14 +551,6 @@ function card(p) {
     updateQuantity();
 
   };
-
-
-  node.querySelector(
-    '.enquire-product'
-  ).href =
-    whatsappLink(p);
-
-
   node.querySelector(
     '.product-image'
   ).onclick = () =>
@@ -875,19 +851,6 @@ function openProduct(p) {
           >
             Add to Bag
           </button>
-
-
-          <a
-            class="btn modal-whatsapp"
-            aria-label="Enquire on WhatsApp"
-            title="Enquire on WhatsApp"
-            target="_blank"
-            rel="noopener"
-            href="${whatsappLink(p)}"
-          >
-            ◉
-          </a>
-
         </div>
 
       </div>
@@ -1012,14 +975,13 @@ function closeSideMenu() {
 
   side.classList.remove('open');
 
-  // Restore the page exactly where the user was before opening the menu.
+  /* Restore the exact page position after closing the menu. */
   if (document.body.classList.contains('menu-open')) {
     const scrollY = Number(document.body.dataset.menuScrollY || 0);
     document.body.classList.remove('menu-open');
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.width = '';
-    document.body.style.overflow = '';
     window.scrollTo(0, scrollY);
     delete document.body.dataset.menuScrollY;
   }
@@ -1043,14 +1005,13 @@ function openSideMenu() {
 
   if (!side) return;
 
-  // Freeze the page underneath the drawer on desktop and mobile.
+  /* Freeze the entire page underneath the side menu on desktop and mobile. */
   if (!document.body.classList.contains('menu-open')) {
     document.body.dataset.menuScrollY = String(window.scrollY);
     document.body.classList.add('menu-open');
     document.body.style.position = 'fixed';
     document.body.style.top = `-${window.scrollY}px`;
     document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
   }
 
   side.classList.add('open');
@@ -1906,86 +1867,40 @@ function renderCart() {
 
 function configureStore() {
 
-  const phoneHref =
-    `tel:${STORE.phone.replace(
-      /\s/g,
-      ''
-    )}`;
-
-
-  if ($('#sidePhone')) {
-
-    $('#sidePhone').href =
-      phoneHref;
-
-    $('#sidePhone').textContent =
-      STORE.phone;
-
-  }
-
-
   if ($('#sideEmail')) {
-
-    $('#sideEmail').href =
-      `mailto:${STORE.email}`;
-
-    $('#sideEmail').textContent =
-      STORE.email;
-
+    $('#sideEmail').href = `mailto:${STORE.email}`;
   }
-
 
   if ($('#sideInstagram')) {
-
-    $('#sideInstagram').href =
-      STORE.instagram;
-
+    $('#sideInstagram').href = STORE.instagram;
   }
 
+  if ($('#sideWhatsApp')) {
+    $('#sideWhatsApp').href = `https://wa.me/${WHATSAPP}`;
+  }
+
+  if ($('#sideMap')) {
+    $('#sideMap').href = STORE.mapsUrl;
+  }
 
   if ($('#footerAddress')) {
-
-    $('#footerAddress').textContent =
-      STORE.address;
-
+    $('#footerAddress').textContent = STORE.address;
   }
-
 
   if ($('#footerMap')) {
-
-    $('#footerMap').href =
-      STORE.mapsUrl;
-
+    $('#footerMap').href = STORE.mapsUrl;
   }
 
-
-  if ($('#footerPhone')) {
-
-    $('#footerPhone').href =
-      phoneHref;
-
-    $('#footerPhone').textContent =
-      STORE.phone;
-
+  if ($('#footerWhatsApp')) {
+    $('#footerWhatsApp').href = `https://wa.me/${WHATSAPP}`;
   }
-
 
   if ($('#footerEmail')) {
-
-    $('#footerEmail').href =
-      `mailto:${STORE.email}`;
-
-    $('#footerEmail').textContent =
-      STORE.email;
-
+    $('#footerEmail').href = `mailto:${STORE.email}`;
   }
 
-
   if ($('#footerInstagram')) {
-
-    $('#footerInstagram').href =
-      STORE.instagram;
-
+    $('#footerInstagram').href = STORE.instagram;
   }
 
 }

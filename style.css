@@ -247,24 +247,6 @@ button {
   margin-left: 3px;
 }
 
-.whatsapp-pill {
-  background: #366b57;
-  color: #fff;
-  padding: 11px 16px;
-  border-radius: 100px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  transition: .25s;
-}
-
-.whatsapp-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px #4c24383d;
-}
 
 .menu-toggle {
   display: grid;
@@ -454,6 +436,28 @@ button {
   font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
+}
+
+.side-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.side-social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+}
+
+.side-social-icons img {
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
 }
 
 .side-menu-contact a {
@@ -754,17 +758,6 @@ button {
   font-weight: 700;
 }
 
-.enquire-product {
-  display: block;
-  text-align: center;
-  background: #f5eee8;
-  color: #5e3143;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 9px;
-  border-radius: 7px;
-  margin-top: 13px;
-}
 
 /* ============================================================
    PAGINATION
@@ -960,14 +953,6 @@ dialog::backdrop {
   font-size: 13px;
 }
 
-.modal-whatsapp {
-  width: 52px;
-  padding: 0;
-  background: #366b57;
-  color: #fff;
-  border-radius: 100px;
-  font-size: 22px;
-}
 
 /* ============================================================
    CART
@@ -1258,7 +1243,7 @@ footer div a {
 .footer-contact {
   display: grid;
   align-content: start;
-  gap: 7px;
+  gap: 9px;
 }
 
 .footer-contact-heading {
@@ -1273,15 +1258,39 @@ footer div a {
   line-height: 1.45;
 }
 
-.footer-contact #footerMap {
-  color: #d7a86d;
-  font-size: 12px;
-  font-weight: 700;
+.footer-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 5px;
 }
 
-.footer-contact #footerMap:hover {
-  color: #fff;
+.footer-social-icons a {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 !important;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-decoration: none;
 }
+
+.footer-social-icons img {
+  display: block;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  transition: transform .18s ease, opacity .18s ease;
+}
+
+.footer-social-icons a:hover img {
+  transform: scale(1.12);
+  opacity: .85;
+}
+
 
 .copyright {
   grid-column: 1 / -1;
@@ -1298,12 +1307,32 @@ footer div a {
   width: 52px;
   height: 52px;
   border: 0;
-  border-radius: 50%;
-  background: #31775b;
-  color: #fff;
-  font-size: 25px;
-  box-shadow: 0 8px 20px #192b233d;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  box-shadow: none;
   z-index: 15;
+}
+
+.floating-wa img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+/* Keep the page underneath the side menu completely fixed. */
+body.menu-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+body.menu-open .side-menu,
+body.menu-open .menu-backdrop {
+  touch-action: auto;
 }
 
 /* ============================================================
@@ -1323,6 +1352,11 @@ footer div a {
 @media (max-width: 620px) {
   .announcement {
     font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    line-height: 1.2;
+    padding: 7px 8px;
   }
 
   .announcement span {
@@ -1376,16 +1410,14 @@ footer div a {
     gap: 8px;
   }
 
-  .header-actions .whatsapp-pill {
-    display: none;
-  }
 .header-search {
   width: 180px;
   height: 34px;
 }
 
   .header-search input {
-    font-size: 11px;
+    /* Prevent iOS Safari from auto-zooming when search receives focus. */
+    font-size: 16px !important;
   }
 
   .header-search span {
@@ -1488,11 +1520,6 @@ footer div a {
     padding: 0 5px;
   }
 
-  .enquire-product {
-    font-size: 10px;
-    padding: 8px;
-  }
-
   .pagination {
     justify-content: flex-end;
     gap: 3px;
@@ -1576,14 +1603,6 @@ footer div a {
 
   .modal-actions {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .modal-whatsapp {
-    width: auto;
-  }
-
-  .modal-actions .modal-whatsapp {
-    grid-column: 1 / -1;
   }
 
   .cart-content,
@@ -1687,11 +1706,6 @@ footer div a {
     gap: 4px;
   }
 
-  .site-header .whatsapp-pill {
-    padding: 7px 8px;
-    font-size: 12px;
-  }
-
   .site-header .cart-trigger {
     padding: 7px 8px;
     font-size: 12px;
@@ -1783,17 +1797,8 @@ footer div a {
     font-size: 9px;
   }
 
-  /* Hide WhatsApp pill on mobile to give search more space */
-  .whatsapp-pill {
-    display: none;
-  }
-
 }
 @media (max-width: 768px) {
-  .whatsapp-pill {
-    display: none;
-  }
-
   .header-actions {
     flex: 1;
   }
@@ -1870,9 +1875,6 @@ footer div a {
 #productModal .add-cart:focus {
   border: 1px solid var(--plum) !important;
   outline: none;
-}/* Hide WhatsApp button on top of the product popup image */
-#productModal .modal-whatsapp {
-  display: none !important;
 }
 /* PRODUCT POPUP - QUANTITY + ADD TO BAG */
 
@@ -2089,9 +2091,3 @@ footer div a {
 .side-menu .brand-mark {
   display: none !important;
 }
-/* Keep the page underneath the side drawer completely fixed on ALL screen sizes. */
-body.menu-open {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-}
-
