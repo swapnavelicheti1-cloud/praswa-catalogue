@@ -316,7 +316,6 @@ const productId = p =>
 /* ============================================================
    PRICE
    ============================================================ */
-
 function priceOf(p) {
 
   const raw =
@@ -334,11 +333,25 @@ function priceOf(p) {
       )
     );
 
-  return Number.isFinite(n)
-    ? n
+  // Normal Price column has priority when available.
+  if (Number.isFinite(n) && n > 0) {
+    return n;
+  }
+
+  // If Price is blank, use the lowest SizePrices value.
+  // Example:
+  // Small=80, Medium=120, Large=150, XL=200
+  // → product price becomes ₹80 for filtering.
+  const sizePrices = sizePriceMap(p);
+
+  const values = Object.values(sizePrices)
+    .map(Number)
+    .filter(price => Number.isFinite(price) && price > 0);
+
+  return values.length
+    ? Math.min(...values)
     : 0;
 }
-
 
 /* ============================================================
    SIZE-WISE PRICING
