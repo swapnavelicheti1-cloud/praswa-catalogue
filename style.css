@@ -2094,7 +2094,6 @@ body.menu-open .menu-backdrop {
 
 /* ============================================================
    SIZE-WISE PRICING CONTROLS
-   Added without changing existing storefront styles.
    ============================================================ */
 .size-selector-wrap,
 .modal-size-selector-wrap {
@@ -2111,21 +2110,58 @@ body.menu-open .menu-backdrop {
   white-space: nowrap;
 }
 
-.size-selector,
-.modal-size-selector {
-  min-width: 82px;
-  padding: 6px 26px 6px 9px;
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.size-option {
+  min-width: 38px;
+  min-height: 26px;
+  padding: 4px 7px;
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: 6px;
   background: #fff;
   color: var(--ink);
-  font-size: 13px;
+  font-size: 11px;
+  line-height: 1.1;
+  transition: .2s ease;
+}
+.size-option:hover {
+  border-color: var(--rose);
+  color: var(--wine);
+  background: #fff8f5;
+}
+
+.size-option.active {
+  border-color: var(--wine);
+  background: var(--wine);
+  color: #fff;
+  font-weight: 700;
+}
+
+.size-option.is-disabled,
+.size-option:disabled {
+  opacity: 1;
+  color: var(--ink);
+  background: #fff;
+  cursor: default;
 }
 
 .modal-size-selector-wrap {
+  align-items: flex-start;
   margin: 4px 0 16px;
 }
 
+.modal-size-options {
+  gap: 7px;
+}
+.modal-size-options .size-option {
+  min-width: 42px;
+  min-height: 28px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
 .cart-item-size {
   display: block;
   font-size: 12px;
@@ -2139,128 +2175,13 @@ body.menu-open .menu-backdrop {
     gap: 6px;
   }
 
-  .size-selector,
-  .modal-size-selector {
-    font-size: 16px;
+  .size-options {
+    gap: 5px;
   }
+.size-option {
+  min-width: 36px;
+  min-height: 27px;
+  padding: 4px 7px;
+  font-size: 11px;
 }
-
-/* Keep the default Size control visible on every product card. */
-.size-selector:disabled,
-.modal-size-selector:disabled {
-  opacity: 1;
-  color: var(--ink);
-  background: #fff;
-  cursor: default;
 }
-
-/* ============================================================
-   POLICY ACCORDION
-   ============================================================ */
-
-.policy-updated {
-  margin: -18px 0 22px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.policy-accordion {
-  display: grid;
-  gap: 9px;
-  max-height: min(58vh, 560px);
-  overflow-y: auto;
-  padding-right: 3px;
-}
-
-.policy-item {
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  background: #fff;
-  overflow: hidden;
-}
-
-.policy-item summary {
-  list-style: none;
-  cursor: pointer;
-  padding: 15px 17px;
-  color: var(--plum);
-  font-weight: 600;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.policy-item summary::-webkit-details-marker { display: none; }
-
-.policy-item summary span {
-  color: var(--wine);
-  font-size: 19px;
-  line-height: 1;
-  transition: transform .2s ease;
-}
-
-.policy-item[open] summary span {
-  transform: rotate(45deg);
-}
-
-.policy-item-body {
-  padding: 0 17px 16px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.65;
-}
-
-.policy-consent {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start;
-  gap: 9px;
-  margin: 2px 0 4px;
-  font-size: 12px !important;
-  line-height: 1.5;
-  color: var(--muted);
-}
-
-.policy-consent input {
-  width: 16px !important;
-  height: 16px;
-  flex: 0 0 16px;
-  margin-top: 1px;
-}
-
-.policy-consent a {
-  color: var(--wine);
-  text-decoration: underline;
-}
-
-@media (max-width: 600px) {
-  .policy-accordion {
-    max-height: 60vh;
-  }
-
-  .policy-item summary {
-    padding: 14px;
-  }
-
-  .policy-item-body {
-    padding: 0 14px 14px;
-  }
-}
-
-/* ============================================================
-   POLICY ACCORDION
-   ============================================================ */
-.policy-updated { margin: -18px 0 22px; color: var(--muted); font-size: 12px; }
-.policy-accordion { display: grid; gap: 9px; max-height: min(58vh, 560px); overflow-y: auto; padding-right: 3px; }
-.policy-item { border: 1px solid var(--line); border-radius: 11px; background: #fff; overflow: hidden; }
-.policy-item summary { list-style: none; cursor: pointer; padding: 15px 17px; color: var(--plum); font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
-.policy-item summary::-webkit-details-marker { display: none; }
-.policy-item summary span { color: var(--wine); font-size: 19px; line-height: 1; transition: transform .2s ease; }
-.policy-item[open] summary span { transform: rotate(45deg); }
-.policy-item-body { padding: 0 17px 16px; color: var(--muted); font-size: 13px; line-height: 1.65; }
-.policy-consent { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 9px; margin: 2px 0 4px; font-size: 12px !important; line-height: 1.5; color: var(--muted); }
-.policy-consent input { width: 16px !important; height: 16px; flex: 0 0 16px; margin-top: 1px; }
-.policy-consent a { color: var(--wine); text-decoration: underline; }
-@media (max-width: 600px) { .policy-accordion { max-height: 60vh; } .policy-item summary { padding: 14px; } .policy-item-body { padding: 0 14px 14px; } }

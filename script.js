@@ -585,27 +585,36 @@ function card(p) {
   let selectedSize = sizeChoices[0] || '';
 
   const priceEl = node.querySelector('.product-price');
-  const wrap = document.createElement('label');
+  const wrap = document.createElement('div');
   wrap.className = 'size-selector-wrap';
   wrap.innerHTML = `
     <span>Size</span>
-    <select class="size-selector" aria-label="Select size" ${sizeChoices.length ? '' : 'disabled'}>
+    <div class="size-options" role="group" aria-label="Select size">
       ${sizeChoices.length
-        ? sizeChoices.map(size => `<option value="${escapeHtml(size)}">${escapeHtml(size)}</option>`).join('')
-        : `<option value="${escapeHtml(fixedSize)}">${escapeHtml(fixedSize)}</option>`}
-    </select>
+        ? sizeChoices.map((size, index) => `
+            <button type="button" class="size-option${index === 0 ? ' active' : ''}" data-size="${escapeHtml(size)}" aria-pressed="${index === 0 ? 'true' : 'false'}">
+              ${escapeHtml(size)}
+            </button>
+          `).join('')
+        : `<button type="button" class="size-option is-disabled" disabled aria-pressed="true">${escapeHtml(fixedSize)}</button>`}
+    </div>
   `;
   priceEl.parentNode.insertBefore(wrap, priceEl);
 
-  const select = wrap.querySelector('.size-selector');
+  const sizeButtons = [...wrap.querySelectorAll('.size-option:not(:disabled)')];
   priceEl.textContent = priceLabel(p, selectedSize);
 
-  if (sizeChoices.length) {
-    select.onchange = () => {
-      selectedSize = select.value;
+  sizeButtons.forEach(button => {
+    button.onclick = () => {
+      selectedSize = button.dataset.size || '';
+      sizeButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
       priceEl.textContent = priceLabel(p, selectedSize);
     };
-  }
+  });
 
 
   const minimum =
@@ -912,14 +921,17 @@ function openProduct(p, initialSize = '') {
 
 
         ${`
-          <label class="modal-size-selector-wrap">
+          <div class="modal-size-selector-wrap">
             <span>Size</span>
-            <select class="modal-size-selector" aria-label="Select size" ${sizeOptions(p).length ? '' : 'disabled'}>
+            <div class="size-options modal-size-options" role="group" aria-label="Select size">
               ${sizeOptions(p).length
-                ? sizeOptions(p).map(size => `<option value="${escapeHtml(size)}" ${size === (initialSize || sizeOptions(p)[0]) ? 'selected' : ''}>${escapeHtml(size)}</option>`).join('')
-                : `<option value="${escapeHtml(value(p, 'Size', 'size') || 'Standard')}">${escapeHtml(value(p, 'Size', 'size') || 'Standard')}</option>`}
-            </select>
-          </label>
+                ? sizeOptions(p).map((size, index) => {
+                    const selected = size === (initialSize || sizeOptions(p)[0]);
+                    return `<button type="button" class="size-option${selected ? ' active' : ''}" data-size="${escapeHtml(size)}" aria-pressed="${selected ? 'true' : 'false'}">${escapeHtml(size)}</button>`;
+                  }).join('')
+                : `<button type="button" class="size-option is-disabled" disabled aria-pressed="true">${escapeHtml(value(p, 'Size', 'size') || 'Standard')}</button>`}
+            </div>
+          </div>
         `}
 
 
@@ -1056,11 +1068,10 @@ function openProduct(p, initialSize = '') {
   const qty =
     $('.modal-quantity-value');
 
-  const modalSizeSelect =
-    $('.modal-size-selector');
+  const modalSizeButtons =
+    [...document.querySelectorAll('#modalContent .modal-size-options .size-option:not(:disabled)')];
 
   let selectedSize =
-    modalSizeSelect?.value ||
     initialSize ||
     sizeOptions(p)[0] ||
     '';
@@ -1075,12 +1086,17 @@ function openProduct(p, initialSize = '') {
     if (detailPrice) detailPrice.textContent = label;
   };
 
-  if (modalSizeSelect) {
-    modalSizeSelect.onchange = () => {
-      selectedSize = modalSizeSelect.value;
+  modalSizeButtons.forEach(button => {
+    button.onclick = () => {
+      selectedSize = button.dataset.size || '';
+      modalSizeButtons.forEach(item => {
+        const active = item === button;
+        item.classList.toggle('active', active);
+        item.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
       updateModalPrice();
     };
-  }
+  });
 
   updateModalPrice();
 
