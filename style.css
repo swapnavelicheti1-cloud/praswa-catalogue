@@ -2185,3 +2185,128 @@ body.menu-open .menu-backdrop {
   font-size: 11px;
 }
 }
+
+/* =========================================================
+   PRASWA GIFTS - POLICY ACCORDION STYLING
+   ========================================================= */
+
+.policy-accordion {
+  display: grid;
+  gap: 12px;
+  max-height: min(58vh, 560px);
+  overflow-y: auto;
+  padding: 3px 5px 5px 2px;
+}
+
+/* Each policy section is a separate bordered card */
+.policy-item {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* Hover effect */
+.policy-item:hover {
+  border-color: var(--gold);
+  box-shadow: 0 3px 12px rgba(65, 35, 48, 0.06);
+}
+
+/* Clickable heading row */
+.policy-item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 18px;
+  color: var(--plum);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  line-height: 1.5;
+}
+
+.policy-item summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Plus icon */
+.policy-item summary span {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--wine);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 0.2s ease,
+              background 0.2s ease,
+              color 0.2s ease;
+}
+
+/* Highlight the open section */
+.policy-item[open] {
+  border-color: var(--gold);
+  background: #fffdf9;
+}
+
+.policy-item[open] summary {
+  color: var(--wine);
+  border-bottom: 1px solid var(--line);
+}
+
+/* Rotate + into an × when expanded */
+.policy-item[open] summary span {
+  transform: rotate(45deg);
+  background: var(--wine);
+  color: #fff;
+  border-color: var(--wine);
+}
+
+/* Expanded content */
+.policy-item-body {
+  padding: 16px 18px 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  background: #fffdf9;
+}
+
+/* Keyboard accessibility */
+.policy-item summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -3px;
+}
+
+/* Mobile layout */
+@media (max-width: 600px) {
+  .policy-accordion {
+    max-height: 60vh;
+    gap: 10px;
+  }
+
+  .policy-item summary {
+    padding: 13px 14px;
+    font-size: 13px;
+  }
+
+  .policy-item summary span {
+    flex-basis: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .policy-item-body {
+    padding: 13px 14px 15px;
+    font-size: 12px;
+    line-height: 1.75;
+  }
+}
