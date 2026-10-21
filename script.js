@@ -1395,10 +1395,14 @@ function renderSideFilters() {
         <label>To <span>₹</span><input id="priceToInput" type="number" min="0" max="${priceCeiling}" step="1" value="${homeMaxPrice}" aria-label="Maximum price"></label>
       </div>
       <div class="price-range-sliders">
-        <label for="priceFromSlider">Minimum <strong id="priceFromValue">₹${homeMinPrice.toLocaleString('en-IN')}</strong></label>
-        <input id="priceFromSlider" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMinPrice}" aria-label="Slide minimum price">
-        <label for="priceToSlider">Maximum <strong id="priceToValue">₹${homeMaxPrice.toLocaleString('en-IN')}</strong></label>
-        <input id="priceToSlider" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMaxPrice}" aria-label="Slide maximum price">
+        <div class="price-range-slider-labels">
+          <span>Price range</span>
+          <strong><span id="priceFromValue">₹${homeMinPrice.toLocaleString('en-IN')}</span> – <span id="priceToValue">₹${homeMaxPrice.toLocaleString('en-IN')}</span></strong>
+        </div>
+        <div class="dual-range-slider" id="dualPriceSlider" style="--range-start:${(homeMinPrice / priceCeiling) * 100}%;--range-end:${(homeMaxPrice / priceCeiling) * 100}%">
+          <input id="priceFromSlider" class="dual-range-input dual-range-min" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMinPrice}" aria-label="Minimum price">
+          <input id="priceToSlider" class="dual-range-input dual-range-max" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMaxPrice}" aria-label="Maximum price">
+        </div>
       </div>
       <button type="button" class="price-range-clear" id="clearPriceRange">Clear</button>
     </div>
@@ -1424,6 +1428,12 @@ function renderSideFilters() {
     const toValue = $('#priceToValue');
     if (fromValue) fromValue.textContent = `₹${homeMinPrice.toLocaleString('en-IN')}`;
     if (toValue) toValue.textContent = `₹${homeMaxPrice.toLocaleString('en-IN')}`;
+    const dualSlider = $('#dualPriceSlider');
+    if (dualSlider) {
+      const ceiling = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
+      dualSlider.style.setProperty('--range-start', `${(homeMinPrice / ceiling) * 100}%`);
+      dualSlider.style.setProperty('--range-end', `${(homeMaxPrice / ceiling) * 100}%`);
+    }
   };
 
   const updatePriceRange = (changedEndpoint, rawValue, source) => {

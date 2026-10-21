@@ -3972,178 +3972,127 @@ body.menu-open .menu-backdrop {
 
 }
 
-/* Price range controls: live From/To fields and sliders */
+/* Price Range - Input Boxes and Clear Button */
 
 .price-range-controls {
-
-  display: grid;
-
-  gap: 12px;
-
+  display: flex;
+  align-items: end;
+  gap: 8px;
   padding: 8px 0 14px;
-
+  flex-wrap: nowrap;
 }
 
 .price-range-fields {
-
-  display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
-  gap: 10px;
-
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
 .price-range-fields label {
-
-  display: grid;
-
-  grid-template-columns: auto 1fr;
-
-  align-items: center;
-
+  display: flex;
+  flex-direction: column;
   gap: 5px;
-
+  flex: 1;
+  min-width: 0;
   color: var(--muted);
-
   font-size: 11px;
-
   font-weight: 600;
-
 }
 
-.price-range-fields label span { color: var(--rose); }
+.price-range-fields label span {
+  color: var(--rose);
+}
 
 .price-range-fields input {
-
+  box-sizing: border-box;
   width: 100%;
-
   min-width: 0;
-
   height: 36px;
-
   border: 1px solid var(--line);
-
   border-radius: 7px;
-
   background: #fff;
-
   color: var(--plum);
-
   padding: 0 7px;
-
   font-size: 12px;
-
-}
-
-.price-range-sliders { display: grid; gap: 5px; }
-
-.price-range-sliders label {
-
-  display: flex;
-
-  justify-content: space-between;
-
-  gap: 8px;
-
-  color: var(--muted);
-
-  font-size: 11px;
-
-}
-
-.price-range-sliders strong { color: var(--wine); font-weight: 700; }
-
-.price-range-sliders input[type="range"] {
-
-  width: 100%;
-
-  accent-color: var(--wine);
-
-  margin: 0 0 5px;
-
-  cursor: pointer;
-
 }
 
 .price-range-clear {
-
-  justify-self: start;
-
+  flex-shrink: 0;
+  height: 36px;
   border: 1px solid var(--line);
-
-  border-radius: 999px;
-
+  border-radius: 7px;
   background: #fff;
-
   color: var(--wine);
-
-  padding: 7px 16px;
-
+  padding: 0 10px;
   font-size: 12px;
-
   font-weight: 700;
-
+  cursor: pointer;
 }
 
-.price-range-clear:hover { background: #f8ebe6; }
+.price-range-clear:hover {
+  background: #f8ebe6;
+}
+/* FIX: Clean Price Range Layout — no sliders */
 
-.price-range-divider {
+.price-range-sliders,
+.price-range-controls input[type="range"] {
+  display: none !important;
+}
 
-  display: flex;
-
-  align-items: center;
-
+.price-range-controls {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
   gap: 8px;
-
-  color: var(--muted);
-
-  font-size: 10px;
-
-  margin: 2px 0 6px;
-
+  padding: 10px 0 14px;
 }
 
-.price-range-divider::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+.price-range-fields {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: 8px;
+  min-width: 0;
+}
 
-.catalogue-filter-button {
+.price-range-fields label {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 1.4;
+}
 
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 6px;
-
-  min-height: 40px;
-
+.price-range-fields input {
+  display: block;
+  width: 100% !important;
+  min-width: 0;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 8px;
   border: 1px solid var(--line);
-
-  border-radius: 9px;
-
+  border-radius: 7px;
   background: #fff;
-
   color: var(--plum);
-
-  padding: 0 13px;
-
   font-size: 12px;
-
-  font-weight: 700;
-
-  white-space: nowrap;
-
 }
 
-.catalogue-filter-button:hover { border-color: var(--rose); background: #fffaf5; }
-
-.catalogue-filter-button span { font-size: 17px; line-height: 1; }
-
-@media (max-width: 620px) {
-
-  .products-heading-right { gap: 7px; }
-
-  .catalogue-filter-button { min-height: 38px; padding: 0 10px; font-size: 11px; }
-
+.price-range-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: end;
+  height: 36px;
+  padding: 0 12px;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--wine);
+  font-size: 12px;
+  font-weight: 700;
 }
