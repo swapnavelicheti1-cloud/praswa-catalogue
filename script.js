@@ -103,7 +103,7 @@ let homePage = 1;
 
    null = not initialized
 */
-let homeMinPrice = null;
+let homeMinPrice = 0;
 let homeMaxPrice = null;
 
 
@@ -1383,33 +1383,95 @@ function renderSideFilters() {
      QUICK PRICE FILTERS
      ---------------------------------------------------------- */
 
+  const priceCeiling = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
+  if (homeMaxPrice === null || !Number.isFinite(Number(homeMaxPrice))) homeMaxPrice = priceCeiling;
+  homeMinPrice = Math.max(0, Math.min(Number(homeMinPrice) || 0, priceCeiling));
+  homeMaxPrice = Math.max(homeMinPrice, Math.min(Number(homeMaxPrice) || priceCeiling, priceCeiling));
+
   priceMenu.innerHTML = `
-    <button type="button" class="side-price-item" data-price-filter="all">
-      All Prices
-    </button>
-
-    <button type="button" class="side-price-item" data-price-filter="100">
-      Under ₹100
-    </button>
-
-    <button type="button" class="side-price-item" data-price-filter="200">
-      Under ₹200
-    </button>
-
-    <button type="button" class="side-price-item" data-price-filter="300">
-      Under ₹300
-    </button>
-
-    <button type="button" class="side-price-item" data-price-filter="500">
-      Under ₹500
-    </button>
-
-    <button type="button" class="side-price-item" data-price-filter="1000-plus">
-      ₹1,000 &amp; Above
-    </button>
-
-
+    <div class="price-range-controls">
+      <div class="price-range-fields">
+        <label>From <span>₹</span><input id="priceFromInput" type="number" min="0" max="${priceCeiling}" step="1" value="${homeMinPrice}" aria-label="Minimum price"></label>
+        <label>To <span>₹</span><input id="priceToInput" type="number" min="0" max="${priceCeiling}" step="1" value="${homeMaxPrice}" aria-label="Maximum price"></label>
+      </div>
+      <div class="price-range-sliders">
+        <label for="priceFromSlider">Minimum <strong id="priceFromValue">₹${homeMinPrice.toLocaleString('en-IN')}</strong></label>
+        <input id="priceFromSlider" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMinPrice}" aria-label="Slide minimum price">
+        <label for="priceToSlider">Maximum <strong id="priceToValue">₹${homeMaxPrice.toLocaleString('en-IN')}</strong></label>
+        <input id="priceToSlider" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMaxPrice}" aria-label="Slide maximum price">
+      </div>
+      <button type="button" class="price-range-clear" id="clearPriceRange">Clear</button>
+    </div>
+    <div class="price-range-divider"><span>Quick price options</span></div>
+    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice >= priceCeiling ? 'active' : ''}" data-price-filter="all">All Prices</button>
+    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 100 ? 'active' : ''}" data-price-filter="100">Under ₹100</button>
+    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 200 ? 'active' : ''}" data-price-filter="200">Under ₹200</button>
+    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 300 ? 'active' : ''}" data-price-filter="300">Under ₹300</button>
+    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 500 ? 'active' : ''}" data-price-filter="500">Under ₹500</button>
+    <button type="button" class="side-price-item ${homeMinPrice === 1000 && homeMaxPrice >= priceCeiling ? 'active' : ''}" data-price-filter="1000-plus">₹1,000 &amp; Above</button>
   `;
+
+  const syncPriceControlValues = () => {
+    const fromInput = $('#priceFromInput');
+    const toInput = $('#priceToInput');
+    const fromSlider = $('#priceFromSlider');
+    const toSlider = $('#priceToSlider');
+    if (fromInput) fromInput.value = String(homeMinPrice);
+    if (toInput) toInput.value = String(homeMaxPrice);
+    if (fromSlider) fromSlider.value = String(homeMinPrice);
+    if (toSlider) toSlider.value = String(homeMaxPrice);
+    const fromValue = $('#priceFromValue');
+    const toValue = $('#priceToValue');
+    if (fromValue) fromValue.textContent = `₹${homeMinPrice.toLocaleString('en-IN')}`;
+    if (toValue) toValue.textContent = `₹${homeMaxPrice.toLocaleString('en-IN')}`;
+  };
+
+  const updatePriceRange = (changedEndpoint, rawValue, source) => {
+    const maxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
+    const parsed = rawValue === '' ? (changedEndpoint === 'min' ? 0 : maxPrice) : Number(rawValue);
+    if (!Number.isFinite(parsed)) return;
+    const next = Math.max(0, Math.min(parsed, maxPrice));
+    if (changedEndpoint === 'min') {
+      homeMinPrice = next;
+      if (homeMinPrice > homeMaxPrice) homeMaxPrice = homeMinPrice;
+    } else {
+      homeMaxPrice = next;
+      if (homeMaxPrice < homeMinPrice) homeMinPrice = homeMaxPrice;
+    }
+    homePage = 1;
+    syncPriceControlValues();
+    renderHomeCategories();
+    // The heading is rebuilt during filtering; keep the side menu controls in sync.
+    syncPriceControlValues();
+  };
+
+  ['priceFromInput', 'priceFromSlider'].forEach(id => {
+    const control = $('#' + id);
+    if (!control) return;
+    control.addEventListener('input', () => {
+      if (id.includes('Slider') || control.value !== '') updatePriceRange('min', control.value, id.includes('Slider') ? 'slider' : 'input');
+    });
+    if (!id.includes('Slider')) control.addEventListener('change', () => {
+      if (control.value === '') updatePriceRange('min', '0', 'input');
+    });
+  });
+  ['priceToInput', 'priceToSlider'].forEach(id => {
+    const control = $('#' + id);
+    if (!control) return;
+    control.addEventListener('input', () => {
+      if (id.includes('Slider') || control.value !== '') updatePriceRange('max', control.value, id.includes('Slider') ? 'slider' : 'input');
+    });
+    if (!id.includes('Slider')) control.addEventListener('change', () => {
+      if (control.value === '') updatePriceRange('max', String(Math.max(25000, ...products.map(priceOf).filter(price => price > 0))), 'input');
+    });
+  });
+  $('#clearPriceRange')?.addEventListener('click', () => {
+    homeMinPrice = 0;
+    homeMaxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
+    homePage = 1;
+    renderHomeCategories();
+    renderSideFilters();
+  });
 
   /* ----------------------------------------------------------
      MATERIAL CLICK
@@ -1477,7 +1539,7 @@ function renderSideFilters() {
 
         if (filter === 'all') {
           homeMinPrice = 0;
-          homeMaxPrice = null;
+          homeMaxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
         } else if (filter === '100') {
           homeMinPrice = 0;
           homeMaxPrice = 100;
@@ -1492,7 +1554,7 @@ function renderSideFilters() {
           homeMaxPrice = 500;
         } else if (filter === '1000-plus') {
           homeMinPrice = 1000;
-          homeMaxPrice = null;
+          homeMaxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
         }
 
         homePage = 1;
@@ -2240,6 +2302,10 @@ function renderAppliedFilters() {
     filters.push({ type: 'occasion', label: `Occasion: ${homeOccasion}` });
   }
 
+  if (homeCategory) {
+    filters.push({ type: 'category', label: `Category: ${homeCategory}` });
+  }
+
   const priceCeiling = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
   const priceIsFiltered = homeMinPrice > 0 || (homeMaxPrice !== null && homeMaxPrice < priceCeiling);
 
@@ -2284,7 +2350,8 @@ function renderAppliedFilters() {
       const filter = button.dataset.removeFilter;
       if (filter === 'material') homeMaterial = '';
       if (filter === 'occasion') homeOccasion = '';
-      if (filter === 'price') { homeMinPrice = 0; homeMaxPrice = null; }
+      if (filter === 'category') homeCategory = '';
+      if (filter === 'price') { homeMinPrice = 0; homeMaxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0)); }
       if (filter === 'search') {
         const input = $('#homeSearchInput');
         if (input) input.value = '';
@@ -2298,8 +2365,9 @@ function renderAppliedFilters() {
   $('#clearAllFilters')?.addEventListener('click', () => {
     homeMaterial = '';
     homeOccasion = '';
+    homeCategory = '';
     homeMinPrice = 0;
-    homeMaxPrice = null;
+    homeMaxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
     const input = $('#homeSearchInput');
     if (input) input.value = '';
     homePage = 1;
@@ -2349,23 +2417,8 @@ function renderHomeCategories() {
      INITIAL PRICE STATE
      ---------------------------------------------------------- */
 
-  if (
-    homeMinPrice === null
-  ) {
-
-    homeMinPrice =
-      0;
-
-  }
-
-
-  if (
-    homeMaxPrice === null
-  ) {
-
-    homeMaxPrice =
-      priceCeiling;
-
+  if (homeMaxPrice === null || !Number.isFinite(Number(homeMaxPrice))) {
+    homeMaxPrice = priceCeiling;
   }
 
 
@@ -2389,9 +2442,7 @@ function renderHomeCategories() {
     Math.max(
       homeMinPrice,
       Math.min(
-        Number(
-          homeMaxPrice
-        ) || priceCeiling,
+        (homeMaxPrice === '' || homeMaxPrice === null ? priceCeiling : Number(homeMaxPrice)),
         priceCeiling
       )
     );
@@ -2583,6 +2634,9 @@ function renderHomeCategories() {
       </div>
 
       <div class="products-heading-right">
+        <button type="button" class="catalogue-filter-button" id="openCatalogueFilters" aria-label="Open filters">
+          <span aria-hidden="true">☷</span> Filters
+        </button>
         <label class="sort-label">Sort by</label>
         <select id="homeSortSelect" aria-label="Sort products">
           <option value="default">Sort: Featured</option>
@@ -2611,6 +2665,13 @@ function renderHomeCategories() {
   /* ----------------------------------------------------------
      SORT CHANGE
      ---------------------------------------------------------- */
+
+  $('#openCatalogueFilters')?.addEventListener('click', () => {
+    openSideMenu();
+    const priceHeading = [...document.querySelectorAll('.side-filter-heading')].find(el => el.textContent.includes('Price Range'));
+    if (priceHeading && priceHeading.getAttribute('aria-expanded') !== 'true') priceHeading.click();
+  });
+
 
   $('#homeSortSelect')
     .onchange =
