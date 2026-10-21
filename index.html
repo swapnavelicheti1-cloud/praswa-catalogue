@@ -1,495 +1,1009 @@
 <!doctype html>
+
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="description" content="Praswa Gifts — customised return gifts for every celebration." />
+
   <title>Praswa Gifts | Customized Return Gifts</title>
 
+
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet" />
 
+
+
   <link rel="stylesheet" href="style.css" />
+
 </head>
+
+
 
 <body>
 
+
+
   <div class="announcement">
-    ✦ Customized Return Gifts for Every Special Occasion ✦   
+
+    ✦ Customized Return Gifts for Every Special Occasion ✦  &#x20;
+
   </div>
+
+
 
   <header class="site-header" id="top">
 
+
+
     <!-- Header logo: complete Logo.png -->
+
     <a class="brand" href="#home" aria-label="Praswa Gifts home">
+
       <span class="brand-mark">
+
         <img src="assets/Logo.png" alt="Praswa Gifts Logo">
+
       </span>
+
       <span>
+
         <strong>PRASWA</strong> GIFTS
+
         <small>Customized Return Gifts</small>
+
       </span>
+
     </a>
 
+
+
     <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+
       <i></i><i></i><i></i>
+
     </button>
 
+
+
     <div class="header-actions">
+
       <label class="header-search">
+
         <span>⌕</span>
+
         <input id="homeSearchInput" type="search" placeholder="Search gifts" aria-label="Search gifts" />
+
       </label>
 
+
+
       <button class="cart-trigger" aria-label="Open cart">
+
         <span id="cartCount">0</span>
+
       </button>
+
     </div>
+
+
 
   </header>
 
+
+
   <div class="menu-backdrop" id="menuBackdrop"></div>
 
+
+
   <aside
+
     class="side-menu"
+
     id="sideMenu"
+
     aria-label="Site menu"
+
     aria-hidden="true"
+
   >
 
+
+
     <button
+
       class="side-menu-close"
+
       aria-label="Close menu"
+
     >
+
       ×
+
     </button>
 
+
+
     <!-- Side menu logo: complete Logo.png -->
+
     <a class="brand side-menu-brand"
+
        href="#home"
+
        aria-label="Praswa Gifts home">
 
+
+
       <span class="side-menu-logo">
+
         <img src="assets/Logo.png" alt="Praswa Gifts">
+
       </span>
 
+
+
       <span class="side-menu-brand-text">
+
         <strong>PRASWA <span class="side-menu-gifts">GIFTS</span></strong>
+
         <small>Customized Return Gifts</small>
+
       </span>
+
+
 
     </a>
 
+
+
     <!-- HOME -->
+
     <nav class="side-main-nav">
+
       <a href="#home">Home</a>
+
     </nav>
 
+
+
     <!-- SHOP BY MATERIAL -->
+
     <section class="side-filter-section">
+
+      <button
+
+        type="button"
+
+        class="side-filter-heading"
+
+        aria-expanded="false"
+
+      >
+
+        <span>Shop by Material</span>
+
+        <span class="side-filter-arrow">⌃</span>
+
+      </button>
+
+
+
+      <div
+
+        class="side-filter-content"
+
+        id="sideMaterialMenu"
+
+      ></div>
+
+    </section>
+
+
+
+    <!-- SHOP BY CATEGORY -->
+
+    <section class="side-filter-section">
+
       <button
         type="button"
         class="side-filter-heading"
         aria-expanded="false"
       >
-        <span>Shop by Material</span>
+        <span>Shop by Category</span>
         <span class="side-filter-arrow">⌃</span>
       </button>
 
       <div
         class="side-filter-content"
-        id="sideMaterialMenu"
+        id="sideCategoryMenu"
       ></div>
+
     </section>
 
     <!-- SHOP BY OCCASION -->
+
     <section class="side-filter-section">
+
       <button
+
         type="button"
+
         class="side-filter-heading"
+
         aria-expanded="false"
+
       >
+
         <span>Shop by Occasion</span>
+
         <span class="side-filter-arrow">⌃</span>
+
       </button>
 
+
+
       <div
+
         class="side-filter-content"
+
         id="sideOccasionMenu"
+
       ></div>
+
     </section>
+
+
 
     <!-- PRICE RANGE -->
+
     <section class="side-filter-section">
+
       <button
+
         type="button"
+
         class="side-filter-heading"
+
         aria-expanded="false"
+
       >
+
         <span>Price Range</span>
+
         <span class="side-filter-arrow">⌃</span>
+
       </button>
 
+
+
       <div
+
         class="side-filter-content"
+
         id="sidePriceMenu"
+
       >
+
         <button type="button" class="side-price-item" data-price-filter="all">
+
           All Prices
+
         </button>
+
+
 
         <button type="button" class="side-price-item" data-price-filter="100">
+
           Under ₹100
+
         </button>
+
+
 
         <button type="button" class="side-price-item" data-price-filter="200">
+
           Under ₹200
+
         </button>
+
+
 
         <button type="button" class="side-price-item" data-price-filter="300">
+
           Under ₹300
+
         </button>
+
+
 
         <button type="button" class="side-price-item" data-price-filter="500">
+
           Under ₹500
+
         </button>
+
+
 
         <button type="button" class="side-price-item" data-price-filter="1000-plus">
+
           ₹1,000 &amp; Above
+
         </button>
+
       </div>
+
     </section>
 
+
+
     <!-- TERMS -->
+
     <nav class="side-secondary-nav">
+
       <a href="#terms" data-open-policy="terms">
+
         Terms &amp; Conditions
+
       </a>
+
     </nav>
+
     <!-- CONTACT -->
+
     <div class="side-menu-contact">
+
       <p>Get in touch</p>
 
+
+
       <div class="side-social-icons" aria-label="Contact Praswa Gifts">
+
         <a id="sideInstagram" href="#" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+
           <img src="assets/instagram.png" alt="Instagram">
+
         </a>
+
+
 
         <a id="sideWhatsApp" href="#" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">
+
           <img src="assets/whatsapp.png" alt="WhatsApp">
+
         </a>
+
+
 
         <a id="sideMap" href="#" target="_blank" rel="noopener" aria-label="Location" title="Location">
+
           <img src="assets/Location.png" alt="Location">
+
         </a>
 
+
+
         <a id="sideEmail" href="#" aria-label="Email" title="Email">
+
           <img src="assets/mail.png" alt="Email">
+
         </a>
+
       </div>
+
     </div>
+
+
 
   </aside>
 
+
+
   <main id="home">
+
+
 
     <section class="section home-categories" id="homeCategories">
 
-      <div
-        class="home-products-heading"
-        id="homeProductsHeading"
-      ></div>
+
 
       <div
-        class="product-grid home-products"
-        id="homeProductsGrid"
+
+        class="home-products-heading"
+
+        id="homeProductsHeading"
+
       ></div>
+
+
+
+      <div
+
+        class="product-grid home-products"
+
+        id="homeProductsGrid"
+
+      ></div>
+
+
 
       <nav
+
         class="pagination pagination-bottom"
+
         id="homePagination"
+
         aria-label="Product pages"
+
       ></nav>
+
+
 
     </section>
 
+
+
   </main>
 
+
+
   <!-- FOOTER -->
+
   <footer>
 
+
+
     <a class="brand footer-brand"
+
        href="#home"
+
        aria-label="Praswa Gifts home">
 
+
+
       <img
+
         src="assets/Logo.png"
+
         alt="Praswa Gifts"
+
         class="footer-logo"
+
       />
 
+
+
       <span>
+
         <strong>PRASWA</strong> GIFTS
+
         <small>Customized Return Gifts</small>
+
       </span>
+
+
 
     </a>
 
+
+
     <div>
+
       <p>Quick Links</p>
+
       <a href="#home">Home</a>
+
       <a href="#terms" data-open-policy="terms">Terms &amp; Conditions</a>
+
       <a href="#privacy" data-open-policy="privacy">Privacy Policy</a>
+
       <a href="#refund" data-open-policy="refund">Cancellation &amp; Refund</a>
+
       <a href="#shipping" data-open-policy="shipping">Shipping &amp; Delivery</a>
+
     </div>
+
+
 
     <div class="footer-contact">
+
       <p class="footer-contact-heading">Address</p>
+
       <span id="footerAddress"></span>
 
+
+
       <div class="footer-social-icons" aria-label="Contact Praswa Gifts">
+
         <a
+
           id="footerInstagram"
+
           href="#"
+
           target="_blank"
+
           rel="noopener"
+
           aria-label="Instagram"
+
           title="Instagram"
+
         >
+
           <img src="assets/instagram.png" alt="Instagram">
+
         </a>
 
+
+
         <a
+
           id="footerWhatsApp"
+
           href="https://wa.me/918985390330"
+
           target="_blank"
+
           rel="noopener"
+
           aria-label="WhatsApp"
+
           title="WhatsApp"
+
         >
+
           <img src="assets/whatsapp.png" alt="WhatsApp">
+
         </a>
 
+
+
         <a
+
           id="footerMap"
+
           href="#"
+
           target="_blank"
+
           rel="noopener"
+
           aria-label="Location"
+
           title="Location"
+
         >
+
           <img src="assets/Location.png" alt="Location">
+
         </a>
 
+
+
         <a
+
           id="footerEmail"
+
           href="#"
+
           aria-label="Email"
+
           title="Email"
+
         >
+
           <img src="assets/mail.png" alt="Email">
+
         </a>
+
       </div>
+
     </div>
 
+
+
     <small class="copyright">
+
       © 2026 Praswa Gifts. All rights reserved.
+
     </small>
+
+
 
   </footer>
 
+
+
   <button
+
     class="floating-wa"
+
     aria-label="Chat on WhatsApp"
+
     onclick="window.open('https://wa.me/918985390330','_blank')"
+
   >
+
     <img src="assets/whatsapp.png" alt="WhatsApp">
+
   </button>
 
+
+
   <!-- POLICIES MODAL -->
+
   <dialog id="termsModal" class="terms-modal">
+
     <button class="modal-close" aria-label="Close policy">×</button>
+
     <div class="terms-modal-content">
+
       <p class="eyebrow" id="policyEyebrow">Please note</p>
+
       <h2 id="policyTitle">Terms &amp; <em>Conditions</em></h2>
+
       <p class="policy-updated">Last updated: October 2026</p>
+
       <div class="policy-accordion" id="policyContent"></div>
+
     </div>
+
   </dialog>
+
+
 
   <!-- PRODUCT MODAL -->
+
   <dialog id="productModal">
+
     <button
+
       class="modal-close"
+
       aria-label="Close product details"
+
     >
+
       ×
+
     </button>
+
+
 
     <div id="modalContent"></div>
+
   </dialog>
 
+
+
   <!-- CART MODAL -->
+
   <dialog id="cartModal">
+
     <button
+
       class="modal-close"
+
       aria-label="Close cart"
+
     >
+
       ×
+
     </button>
 
+
+
     <div class="cart-content">
+
       <p class="eyebrow">Your selection</p>
 
+
+
       <h2>
+
         Your Gift <em>Bag</em>
+
       </h2>
+
+
 
       <div id="cartItems"></div>
 
+
+
       <div class="cart-total">
+
         <span>Total</span>
+
         <b id="cartTotal">₹0</b>
+
       </div>
 
+
+
       <button
+
         class="btn btn-primary"
+
         id="checkoutButton"
+
       >
+
         Checkout on WhatsApp <span>→</span>
+
       </button>
+
     </div>
+
   </dialog>
+
+
 
   <!-- CHECKOUT MODAL -->
+
   <dialog id="checkoutModal">
+
     <button
+
       class="modal-close"
+
       aria-label="Close checkout"
+
     >
+
       ×
+
     </button>
 
+
+
     <form
+
       class="checkout-form"
+
       id="checkoutForm"
+
     >
+
       <p class="eyebrow">Almost there</p>
 
+
+
       <h2>
+
         Delivery <em>Details</em>
+
       </h2>
 
+
+
       <label>
+
         Name
+
         <input name="name" required autocomplete="name" />
+
       </label>
 
+
+
       <label>
+
         Phone number
+
         <input name="phone" required type="tel" autocomplete="tel" />
+
       </label>
 
+
+
       <label>
+
         Delivery address
+
         <textarea
+
           name="address"
+
           required
+
           autocomplete="street-address"
+
           rows="4"
+
         ></textarea>
+
       </label>
+
+
 
       <label class="policy-consent">
+
         <input type="checkbox" id="policyConsent" required />
+
         <span>I have reviewed the <a href="#terms" data-open-policy="terms">Terms &amp; Conditions</a> and agree to the applicable policies.</span>
+
       </label>
 
+
+
       <button
+
         class="btn btn-primary"
+
         type="submit"
+
       >
+
         Send Order on WhatsApp <span>→</span>
+
       </button>
+
+
 
     </form>
+
   </dialog>
 
+
+
   <!-- PRODUCT TEMPLATE -->
+
   <template id="productTemplate">
+
     <article class="product-card">
 
+
+
       <button
+
         class="product-image"
+
         type="button"
+
       >
+
         <img alt="" loading="lazy" />
+
         <span class="image-fallback">
+
           PRASWA<br />GIFTS
+
         </span>
+
       </button>
+
+
 
       <div class="product-body">
 
+
+
         <p class="product-category"></p>
+
+
 
         <h3></h3>
 
+
+
         <p class="product-code"></p>
+
+
 
         <p class="product-price"></p>
 
+
+
         <p class="minimum-note"></p>
+
+
 
         <div class="card-actions">
 
+
+
           <div
+
             class="product-quantity"
+
             aria-label="Select quantity"
+
           >
+
             <button
+
               type="button"
+
               class="quantity-minus"
+
               aria-label="Decrease quantity"
+
             >
+
               −
+
             </button>
+
+
 
             <input
+
               class="quantity-value"
+
               type="number"
+
               min="1"
+
               value="1"
+
               inputmode="numeric"
+
               aria-label="Quantity"
+
             />
 
+
+
             <button
+
               type="button"
+
               class="quantity-plus"
+
               aria-label="Increase quantity"
+
             >
+
               +
+
             </button>
+
           </div>
 
+
+
           <button
+
             class="add-cart"
+
             type="button"
+
           >
+
             Add to Bag
+
           </button>
+
+
 
         </div>
 
+
+
       </div>
 
+
+
     </article>
+
   </template>
+
+
 
   <script src="script.js"></script>
 
+
+
 </body>
+
 </html>

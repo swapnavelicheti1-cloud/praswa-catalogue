@@ -52,8 +52,10 @@ let cart = [];
 let productIndex = {
   materialCounts: new Map(),
   occasionCounts: new Map(),
+  categoryCounts: new Map(),
   materials: [],
-  occasions: []
+  occasions: [],
+  categories: []
 };
 
 /* Load product images only when they are near the viewport. */
@@ -92,6 +94,7 @@ function observeLazyImage(img) {
 
 let homeMaterial = '';
 let homeOccasion = '';
+let homeCategory = '';
 
 let homePage = 1;
 
@@ -1267,13 +1270,16 @@ function renderSideFilters() {
   const materialMenu =
     $('#sideMaterialMenu');
 
+  const categoryMenu =
+    $('#sideCategoryMenu');
+
   const occasionMenu =
     $('#sideOccasionMenu');
 
   const priceMenu =
     $('#sidePriceMenu');
 
-  if (!materialMenu || !occasionMenu || !priceMenu) {
+  if (!materialMenu || !categoryMenu || !occasionMenu || !priceMenu) {
     return;
   }
 
@@ -1301,6 +1307,38 @@ function renderSideFilters() {
           type="button"
           class="side-filter-item ${homeMaterial === name ? 'active' : ''}"
           data-material="${escapeHtml(name)}"
+        >
+          <span>${escapeHtml(name)}</span>
+          <span class="side-filter-count">${count}</span>
+        </button>
+      `;
+    }).join('')}
+  `;
+
+  /* ----------------------------------------------------------
+     CATEGORY LIST (from the spreadsheet Category column)
+     ---------------------------------------------------------- */
+
+  const categories = productIndex.categories;
+
+  categoryMenu.innerHTML = `
+    <button
+      type="button"
+      class="side-filter-item ${!homeCategory ? 'active' : ''}"
+      data-category=""
+    >
+      <span>All Categories</span>
+      <span class="side-filter-count">${products.length}</span>
+    </button>
+
+    ${categories.map(name => {
+      const count = productIndex.categoryCounts.get(name) || 0;
+
+      return `
+        <button
+          type="button"
+          class="side-filter-item ${homeCategory === name ? 'active' : ''}"
+          data-category="${escapeHtml(name)}"
         >
           <span>${escapeHtml(name)}</span>
           <span class="side-filter-count">${count}</span>
@@ -1383,6 +1421,25 @@ function renderSideFilters() {
       button.onclick = () => {
         homeMaterial = button.dataset.material;
         homeOccasion = '';
+        homeCategory = '';
+        homePage = 1;
+        renderHomeCategories();
+        renderSideFilters();
+        closeSideMenu();
+      };
+    });
+
+  /* ----------------------------------------------------------
+     CATEGORY CLICK
+     ---------------------------------------------------------- */
+
+  categoryMenu
+    .querySelectorAll('[data-category]')
+    .forEach(button => {
+      button.onclick = () => {
+        homeCategory = button.dataset.category;
+        homeMaterial = '';
+        homeOccasion = '';
         homePage = 1;
         renderHomeCategories();
         renderSideFilters();
@@ -1400,6 +1457,7 @@ function renderSideFilters() {
       button.onclick = () => {
         homeOccasion = button.dataset.occasion;
         homeMaterial = '';
+        homeCategory = '';
         homePage = 1;
         renderHomeCategories();
         renderSideFilters();
@@ -1527,10 +1585,16 @@ function setProducts(data) {
   // scanning/parsing the full product list.
   const materialCounts = new Map();
   const occasionCounts = new Map();
+  const categoryCounts = new Map();
   const materialSet = new Set();
   const occasionSet = new Set();
+  const categorySet = new Set();
 
   products.forEach(p => {
+    const productCategory = value(p, 'Category', 'category') || 'Gifts';
+    categorySet.add(productCategory);
+    categoryCounts.set(productCategory, (categoryCounts.get(productCategory) || 0) + 1);
+
     const material = value(p, 'Material', 'material');
     if (material) {
       materialSet.add(material);
@@ -1555,13 +1619,16 @@ function setProducts(data) {
     ].join(' ').toLowerCase();
     p.__pgPrice = priceOf(p);
     p.__pgMaterial = material;
+    p.__pgCategory = productCategory;
   });
 
   productIndex = {
     materialCounts,
     occasionCounts,
+    categoryCounts,
     materials: [...materialSet].sort((a, b) => a.localeCompare(b)),
-    occasions: [...occasionSet].sort((a, b) => a.localeCompare(b))
+    occasions: [...occasionSet].sort((a, b) => a.localeCompare(b)),
+    categories: [...categorySet].sort((a, b) => a.localeCompare(b))
   };
 
   renderHeaderFilterMenus();
@@ -2378,6 +2445,13 @@ function renderHomeCategories() {
           (
             !homeOccasion ||
             hasOccasion(p, homeOccasion)
+          )
+
+          &&
+
+          (
+            !homeCategory ||
+            (p.__pgCategory ?? category(p)) === homeCategory
           )
 
           &&
