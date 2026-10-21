@@ -4096,3 +4096,66 @@ body.menu-open .menu-backdrop {
   font-size: 12px;
   font-weight: 700;
 }
+/* Price range alignment */
+.price-range-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.price-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.price-field span {
+  font-size: 12px;
+  line-height: 1.4;
+  color: #6b625f;
+}
+
+.price-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 0 8px;
+  border: 1px solid #e3d9d2;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+}
+
+.price-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+#priceApplyButton,
+#priceClearButton {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #e3d9d2;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#priceApplyButton {
+  background: #7b2335;
+  color: #fff;
+  border-color: #7b2335;
+}
+
+#priceClearButton {
+  background: #fff;
+  color: #7b2335;
+}

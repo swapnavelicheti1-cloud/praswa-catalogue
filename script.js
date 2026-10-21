@@ -1389,31 +1389,40 @@ function renderSideFilters() {
   homeMaxPrice = Math.max(homeMinPrice, Math.min(Number(homeMaxPrice) || priceCeiling, priceCeiling));
 
   priceMenu.innerHTML = `
-    <div class="price-range-controls">
-      <div class="price-range-fields">
-        <label>From <span>₹</span><input id="priceFromInput" type="number" min="0" max="${priceCeiling}" step="1" value="${homeMinPrice}" aria-label="Minimum price"></label>
-        <label>To <span>₹</span><input id="priceToInput" type="number" min="0" max="${priceCeiling}" step="1" value="${homeMaxPrice}" aria-label="Maximum price"></label>
-      </div>
-      <div class="price-range-sliders">
-        <div class="price-range-slider-labels">
-          <span>Price range</span>
-          <strong><span id="priceFromValue">₹${homeMinPrice.toLocaleString('en-IN')}</span> – <span id="priceToValue">₹${homeMaxPrice.toLocaleString('en-IN')}</span></strong>
-        </div>
-        <div class="dual-range-slider" id="dualPriceSlider" style="--range-start:${(homeMinPrice / priceCeiling) * 100}%;--range-end:${(homeMaxPrice / priceCeiling) * 100}%">
-          <input id="priceFromSlider" class="dual-range-input dual-range-min" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMinPrice}" aria-label="Minimum price">
-          <input id="priceToSlider" class="dual-range-input dual-range-max" type="range" min="0" max="${priceCeiling}" step="10" value="${homeMaxPrice}" aria-label="Maximum price">
-        </div>
-      </div>
-      <button type="button" class="price-range-clear" id="clearPriceRange">Clear</button>
+  <div class="price-range-fields">
+    <label class="price-field">
+      <span>From (₹)</span>
+      <input
+        type="number"
+        id="priceFromInput"
+        min="0"
+        value="${homeMinPrice}"
+      />
+    </label>
+
+    <label class="price-field">
+      <span>To (₹)</span>
+      <input
+        type="number"
+        id="priceToInput"
+        min="0"
+        value="${homeMaxPrice}"
+      />
+    </label>
+
+    <div class="price-actions">
+      <button type="button" id="priceApplyButton">Apply</button>
+      <button type="button" id="priceClearButton">Clear</button>
     </div>
-    <div class="price-range-divider"><span>Quick price options</span></div>
-    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice >= priceCeiling ? 'active' : ''}" data-price-filter="all">All Prices</button>
-    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 100 ? 'active' : ''}" data-price-filter="100">Under ₹100</button>
-    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 200 ? 'active' : ''}" data-price-filter="200">Under ₹200</button>
-    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 300 ? 'active' : ''}" data-price-filter="300">Under ₹300</button>
-    <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 500 ? 'active' : ''}" data-price-filter="500">Under ₹500</button>
-    <button type="button" class="side-price-item ${homeMinPrice === 1000 && homeMaxPrice >= priceCeiling ? 'active' : ''}" data-price-filter="1000-plus">₹1,000 &amp; Above</button>
-  `;
+  </div>
+  <div class="price-range-divider"><span>Quick price options</span></div>
+  <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice >= priceCeiling ? 'active' : ''}" data-price-filter="all">All Prices</button>
+  <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 100 ? 'active' : ''}" data-price-filter="100">Under ₹100</button>
+  <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 200 ? 'active' : ''}" data-price-filter="200">Under ₹200</button>
+  <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 300 ? 'active' : ''}" data-price-filter="300">Under ₹300</button>
+  <button type="button" class="side-price-item ${homeMinPrice === 0 && homeMaxPrice === 500 ? 'active' : ''}" data-price-filter="500">Under ₹500</button>
+  <button type="button" class="side-price-item ${homeMinPrice === 1000 && homeMaxPrice >= priceCeiling ? 'active' : ''}" data-price-filter="1000-plus">₹1,000 &amp; Above</button>
+`;
 
   const syncPriceControlValues = () => {
     const fromInput = $('#priceFromInput');
@@ -1436,52 +1445,58 @@ function renderSideFilters() {
     }
   };
 
-  const updatePriceRange = (changedEndpoint, rawValue, source) => {
-    const maxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
-    const parsed = rawValue === '' ? (changedEndpoint === 'min' ? 0 : maxPrice) : Number(rawValue);
-    if (!Number.isFinite(parsed)) return;
-    const next = Math.max(0, Math.min(parsed, maxPrice));
-    if (changedEndpoint === 'min') {
-      homeMinPrice = next;
-      if (homeMinPrice > homeMaxPrice) homeMaxPrice = homeMinPrice;
-    } else {
-      homeMaxPrice = next;
-      if (homeMaxPrice < homeMinPrice) homeMinPrice = homeMaxPrice;
-    }
-    homePage = 1;
-    syncPriceControlValues();
-    renderHomeCategories();
-    // The heading is rebuilt during filtering; keep the side menu controls in sync.
-    syncPriceControlValues();
-  };
+  // Apply the price range only when the user clicks Apply.
+  $('#priceApplyButton')?.addEventListener('click', () => {
+    const fromInput = $('#priceFromInput');
+    const toInput = $('#priceToInput');
+    if (!fromInput || !toInput) return;
 
-  ['priceFromInput', 'priceFromSlider'].forEach(id => {
-    const control = $('#' + id);
-    if (!control) return;
-    control.addEventListener('input', () => {
-      if (id.includes('Slider') || control.value !== '') updatePriceRange('min', control.value, id.includes('Slider') ? 'slider' : 'input');
-    });
-    if (!id.includes('Slider')) control.addEventListener('change', () => {
-      if (control.value === '') updatePriceRange('min', '0', 'input');
-    });
+    const priceCeiling = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
+    const fromRaw = fromInput.value.trim();
+    const toRaw = toInput.value.trim();
+
+    // Empty From means no minimum; empty To means no maximum.
+    const enteredMin = fromRaw === '' ? 0 : Number(fromRaw);
+    const enteredMax = toRaw === '' ? priceCeiling : Number(toRaw);
+
+    if (
+      !Number.isFinite(enteredMin) ||
+      !Number.isFinite(enteredMax) ||
+      enteredMin < 0 ||
+      enteredMax < 0
+    ) {
+      alert('Please enter valid non-negative prices.');
+      return;
+    }
+
+    const minValue = Math.min(enteredMin, priceCeiling);
+    const maxValue = Math.min(enteredMax, priceCeiling);
+
+    if (minValue > maxValue) {
+      alert('The From price must be less than or equal to the To price.');
+      return;
+    }
+
+    homeMinPrice = minValue;
+    homeMaxPrice = maxValue;
+    homePage = 1;
+
+    renderHomeCategories();
+    syncPriceControlValues();
   });
-  ['priceToInput', 'priceToSlider'].forEach(id => {
-    const control = $('#' + id);
-    if (!control) return;
-    control.addEventListener('input', () => {
-      if (id.includes('Slider') || control.value !== '') updatePriceRange('max', control.value, id.includes('Slider') ? 'slider' : 'input');
-    });
-    if (!id.includes('Slider')) control.addEventListener('change', () => {
-      if (control.value === '') updatePriceRange('max', String(Math.max(25000, ...products.map(priceOf).filter(price => price > 0))), 'input');
-    });
-  });
-  $('#clearPriceRange')?.addEventListener('click', () => {
+
+  // Clear the custom price range and show products at all prices.
+  const clearPriceRange = () => {
     homeMinPrice = 0;
     homeMaxPrice = Math.max(25000, ...products.map(priceOf).filter(price => price > 0));
     homePage = 1;
     renderHomeCategories();
-    renderSideFilters();
-  });
+    syncPriceControlValues();
+  };
+
+  $('#priceClearButton')?.addEventListener('click', clearPriceRange);
+  // Keep compatibility with any existing external Clear Price control.
+  $('#clearPriceRange')?.addEventListener('click', clearPriceRange);
 
   /* ----------------------------------------------------------
      MATERIAL CLICK
